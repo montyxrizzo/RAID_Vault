@@ -13,9 +13,11 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
     <div className="h-full flex flex-col">
       <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
         <div className="flex-1">
-          <Link className="btn btn-ghost normal-case text-xl" to="/">
-            <img className="h-20 md:h-14" alt="Logo" src="/logo.png" />
-          </Link>
+        <Link className="btn btn-ghost normal-case text-xl rounded-full" to="/">
+    <img className="h-15 md:h-10 rounded-full" alt="Logo" src="/logo.png" />
+</Link>
+
+
           <ul className="menu menu-horizontal px-1 space-x-2">
             {links.map(({ label, path }) => (
               <li key={path}>

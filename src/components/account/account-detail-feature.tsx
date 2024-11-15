@@ -1,123 +1,157 @@
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Transaction, Connection, SystemProgram } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import { useEffect, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { ExplorerLink } from '../cluster/cluster-ui';
 import { AppHero, ellipsify } from '../ui/ui-layout';
 import { AccountBalance, AccountButtons, AccountTokens, AccountTransactions } from './account-ui';
+import { ToastContainer, toast } from 'react-toastify'; // Import Toast components
+import 'react-toastify/dist/ReactToastify.css'; // Import Toast CSS
 
-interface BackendInfo {
-  status: string;
-  benchmark_score: number;
-  total_uptime: number;         // Total uptime in seconds
-  total_rewards: number;        // Sum of rewards earned
-  available_rewards: number;    // Rewards available for claiming
-}
+const RAID_MINT_ADDRESS = new PublicKey("BPFw62HkLiacp1h7MCitiWRZHpWSThxycDbVmn7rMUGx"); // RAID token mint address
+const STAKING_ADDRESS = new PublicKey("8gqRr2UwjBJ1zFg3B63tZji7C8UjXUm5u6kLANcxay2H"); // Staking vault address
+const DECIMALS = 9; // RAID has 9 decimals
 
 export default function AccountDetailFeature() {
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction, connected } = useWallet();
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [backendInfo, setBackendInfo] = useState<BackendInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [amountStaked, setAmountStaked] = useState<number>(0);
+  const [availableToStake, setAvailableToStake] = useState<number>(0);
+  const [stakingAmount, setStakingAmount] = useState<number>(0);
+  const [stakingStatus, setStakingStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [claiming, setClaiming] = useState(false); // New state for claim status
+
+  const connection = new Connection("https://api.devnet.solana.com", "processed");
 
   useEffect(() => {
     if (publicKey) {
-      const address = publicKey.toBase58();
-      setWalletAddress(address);
-    } else {
-      setWalletAddress(null);
+      setWalletAddress(publicKey.toBase58());
+      fetchRaidBalance();
     }
   }, [publicKey]);
 
-  useEffect(() => {
-    if (!walletAddress) return;
-
-    const fetchBackendInfo = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`http://127.0.0.1:8000/client-data/${walletAddress}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data: BackendInfo = await response.json();
-        setBackendInfo(data);
-      } catch (error) {
-        setError('Failed to load backend information');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBackendInfo();
-  }, [walletAddress]);
-
-  // Claim rewards function
-  const claimRewards = async () => {
-    if (!walletAddress) return;
-
+  const fetchRaidBalance = async () => {
+    if (!publicKey) return;
     try {
-      setClaiming(true);
-      const response = await fetch(`http://127.0.0.1:8000/client-data/${walletAddress}/claim`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to claim rewards");
-      }
-      const data: { available_rewards: number; total_rewards: number } = await response.json();
-      setBackendInfo((prevInfo) => prevInfo ? { ...prevInfo, available_rewards: data.available_rewards } : null);
+      const raidTokenAccount = await getAssociatedTokenAddress(RAID_MINT_ADDRESS, publicKey);
+      const balanceInfo = await connection.getTokenAccountBalance(raidTokenAccount);
+      setAvailableToStake(parseFloat(balanceInfo.value.uiAmountString || "0"));
     } catch (error) {
-      setError("Error claiming rewards");
-    } finally {
-      setClaiming(false);
+      console.error("Error fetching RAID balance:", error);
     }
   };
 
-  if (!publicKey) {
-    return <div>Please connect your wallet to view account details.</div>;
-  }
+  const handleStake = async () => {
+    if (!connected || !publicKey) {
+      setError("Wallet not connected");
+      return;
+    }
+
+    const amountToStake = stakingAmount;
+    if (!amountToStake || amountToStake <= 0) {
+      setError("Please enter a valid amount to stake.");
+      return;
+    }
+
+    try {
+      setStakingStatus("Staking in progress...");
+      setError(null);
+
+      const raidTokenAccount = await getAssociatedTokenAddress(RAID_MINT_ADDRESS, publicKey);
+      const stakingTokenAccount = await getAssociatedTokenAddress(RAID_MINT_ADDRESS, STAKING_ADDRESS);
+
+      const transaction = new Transaction();
+
+      // Ensure staking account is created
+      const stakingAccountInfo = await connection.getAccountInfo(stakingTokenAccount);
+      if (!stakingAccountInfo) {
+        transaction.add(
+          createAssociatedTokenAccountInstruction(
+            publicKey,
+            stakingTokenAccount,
+            STAKING_ADDRESS,
+            RAID_MINT_ADDRESS
+          )
+        );
+      }
+
+      // Add transfer instruction
+      transaction.add(
+        createTransferInstruction(
+          raidTokenAccount,
+          stakingTokenAccount,
+          publicKey,
+          amountToStake * Math.pow(10, DECIMALS), // Convert amount to base units
+          [],
+          TOKEN_PROGRAM_ID
+        )
+      );
+
+      const signature = await sendTransaction(transaction, connection);
+      console.log(`Transaction signature: ${signature}`);
+
+      // Confirm the transaction
+      await connection.confirmTransaction(signature, 'processed');
+
+      setAmountStaked((prev) => prev + amountToStake);
+      setStakingStatus("Stake successful!");
+      setStakingAmount(0);
+      fetchRaidBalance();
+
+      // Display success toast
+      toast.success(`Successfully staked ${amountToStake} RAID!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
+    } catch (error) {
+      console.error("Error staking rewards:", error);
+      setError("Error staking rewards. Please try again.");
+      setStakingStatus(null);
+    } finally {
+      setStakingStatus(null);
+    }
+  };
 
   return (
     <div>
-      <AppHero
-        title={<AccountBalance address={publicKey} />}
-        subtitle={
-          <div className="my-4">
-            <ExplorerLink path={`account/${publicKey}`} label={ellipsify(publicKey.toString())} />
-          </div>
-        }
-      >
-        <div className="my-4">
-          <AccountButtons address={publicKey} />
-        </div>
+      <ToastContainer /> {/* Container for the toast notifications */}
+      <AppHero title={<AccountBalance address={publicKey!} />} subtitle={ellipsify(publicKey?.toString())}>
+        <AccountButtons address={publicKey!} />
       </AppHero>
 
       <div className="space-y-8">
-        <AccountTokens address={publicKey} />
-        <AccountTransactions address={publicKey} />
+        <AccountTokens address={publicKey!} />
+        <AccountTransactions address={publicKey!} />
 
-        {/* Backend Info Section */}
-        <div className="my-4 p-4 border border-gray-200 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-2">Client Usage Details</h2>
-          {loading && <p>Loading backend info...</p>}
-          {error && <p className="text-red-500">{error}</p>}
-          {backendInfo && (
-            <div>
-              <p><strong>Status:</strong> {backendInfo.status}</p>
-              <p><strong>Benchmark Score:</strong> {backendInfo.benchmark_score}</p>
-              <p><strong>Total Uptime:</strong> {Math.floor(backendInfo.total_uptime / 3600)}h {Math.floor((backendInfo.total_uptime % 3600) / 60)}m</p>
-              <p><strong>Total Rewards Earned:</strong> {backendInfo.total_rewards} RAID</p>
-              <p><strong>Available Rewards:</strong> {backendInfo.available_rewards} RAID</p>
-              <button
-                onClick={claimRewards}
-                disabled={claiming || backendInfo.available_rewards <= 0}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-              >
-                {claiming ? "Claiming..." : "Claim Rewards"}
-              </button>
-            </div>
-          )}
+        <div className="p-4 border rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-2">Staking</h2>
+          <p><strong>Amount Staked:</strong> {amountStaked} RAID</p>
+          <p><strong>Available to Stake:</strong> {availableToStake} RAID</p>
+          <div className="flex items-center mt-4">
+            <input
+              type="number"
+              value={stakingAmount}
+              onChange={(e) => setStakingAmount(Number(e.target.value))}
+              placeholder="Amount"
+              className="px-2 py-1 border rounded mr-2"
+            />
+            <button
+              onClick={handleStake}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={stakingAmount <= 0 || stakingAmount > availableToStake}
+            >
+              Stake
+            </button>
+          </div>
+          <p className="mt-2 text-gray-500">{stakingStatus}</p>
         </div>
+
+        {error && <p className="mt-4 text-red-500">{error}</p>}
       </div>
     </div>
   );
