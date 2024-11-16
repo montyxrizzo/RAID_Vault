@@ -47,7 +47,7 @@ export default function DashboardFeature() {
                     is an incentivized distributed GPU resource provisioning platform, built on <strong className="text-indigo-300">Solana</strong>.
                 </p>
                 <p>
-                    RAID brings together a community of GPU contributors 
+                    RAID brings together a community of GPU contributors, investors, scientists, and engineers
                     who are fueling the future of artificial intelligence. By contributing your GPU’s computing power, 
                     you’re not only advancing the capabilities of AI but also earning rewards in RAID tokens. Every 
                     contribution counts toward creating a more decentralized, accessible, and efficient AI infrastructure.

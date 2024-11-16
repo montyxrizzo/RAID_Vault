@@ -1,65 +1,109 @@
-const anchor = require('@project-serum/anchor');
-const { SystemProgram } = anchor.web3;
+import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { Program, AnchorProvider, web3, utils, BN } from '@project-serum/anchor';
+import idl from './idl.json'; // Replace with the actual path to your compiled IDL file
 
-const MINT_ADDRESS = "BPFw62HkLiacp1h7MCitiWRZHpWSThxycDbVmn7rMUGx";
+// Constants for the stake pool
+const STAKE_POOL_ID = new PublicKey("E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL");
+const RESERVE_STAKE_ACCOUNT = new PublicKey("23EgpVbBPJx9Lbx6fyzUT8vQzpqB1ZYFJHiaMsKV5mhk");
+const REWARD_MINT = new PublicKey("DYFeK9RfDX747gshFAQFaUof72NbS8CdvXTiB8ENsham");
 
-describe("raid_rewards", () => {
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
+// Solana connection setup
+const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+const wallet = // Replace with your wallet provider initialization (e.g., Phantom);
+const provider = new AnchorProvider(connection, wallet, { preflightCommitment: 'processed' });
 
-  const program = anchor.workspace.RaidRewards;
+// Program initialization
+const programId = new PublicKey(idl.metadata.address); // Use the program ID from your IDL
+const program = new Program(idl, programId, provider);
 
-  const admin = provider.wallet;
-  const mint = new anchor.web3.PublicKey(MINT_ADDRESS);
-
-  it("Initializes the vault!", async () => {
+/**
+ * Stake SOL
+ * @param {number} amount - Amount of SOL to stake (in lamports)
+ */
+export async function stakeSol(amount) {
     try {
-      // Derive the vault PDA
-      const [vaultPda, vaultBump] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from("vault_seed")],
-        program.programId
-      );
+        const user = wallet.publicKey;
 
-      const [stakingVaultAuthority] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from("staking_vault_authority")],
-        program.programId
-      );
+        const [userAccount, userAccountBump] = await PublicKey.findProgramAddress(
+            [Buffer.from("user-account"), user.toBuffer()],
+            program.programId
+        );
 
-      const [stakingVault] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from("staking_vault")],
-        program.programId
-      );
+        const tx = await program.methods
+            .stakeSol(new BN(amount))
+            .accounts({
+                user,
+                userAccount,
+                reserveStakeAccount: RESERVE_STAKE_ACCOUNT,
+                systemProgram: web3.SystemProgram.programId,
+            })
+            .rpc();
 
-      // Debug logs to identify account with signature issue
-      console.log("vaultPda:", vaultPda.toString());
-      console.log("stakingVault:", stakingVault.toString());
-      console.log("stakingVaultAuthority:", stakingVaultAuthority.toString());
-      console.log("admin public key:", admin.publicKey.toString());
-
-      // Run the initialize transaction
-      const tx = await program.rpc.initialize(
-        new anchor.BN(1000),
-        {
-          accounts: {
-            vault: vaultPda,
-            admin: admin.publicKey,
-            raidMint: mint,
-            stakingVault,
-            stakingVaultAuthority,
-            systemProgram: SystemProgram.programId,
-            tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          },
-          signers: [admin.payer], // Only include actual signers
-        }
-      );
-
-      console.log("Vault initialized with transaction:", tx);
-      console.log("Vault PDA public key:", vaultPda.toString());
-      console.log("Staking vault public key:", stakingVault.toString());
+        console.log(`Staked ${amount} lamports. Transaction signature: ${tx}`);
     } catch (error) {
-      console.error("Error during vault initialization:", error.message);
-      throw error; // Re-throw to mark test as failed
+        console.error('Error staking SOL:', error);
     }
-  });
-});
+}
+
+/**
+ * Claim Rewards
+ */
+export async function claimRewards() {
+    try {
+        const user = wallet.publicKey;
+
+        const [userAccount, userAccountBump] = await PublicKey.findProgramAddress(
+            [Buffer.from("user-account"), user.toBuffer()],
+            program.programId
+        );
+
+        const userRaidAccount = await utils.token.associatedAddress({
+            mint: REWARD_MINT,
+            owner: user,
+        });
+
+        const tx = await program.methods
+            .claimRewards()
+            .accounts({
+                userAccount,
+                userRaidAccount,
+                rewardAuthority: wallet.publicKey,
+                tokenProgram: utils.token.TOKEN_PROGRAM_ID,
+            })
+            .rpc();
+
+        console.log(`Rewards claimed successfully. Transaction signature: ${tx}`);
+    } catch (error) {
+        console.error('Error claiming rewards:', error);
+    }
+}
+
+/**
+ * Unstake SOL
+ * @param {number} amount - Amount of SOL to unstake (in lamports)
+ */
+export async function unstakeSol(amount) {
+    try {
+        const user = wallet.publicKey;
+
+        const [userAccount, userAccountBump] = await PublicKey.findProgramAddress(
+            [Buffer.from("user-account"), user.toBuffer()],
+            program.programId
+        );
+
+        const tx = await program.methods
+            .unstakeSol(new BN(amount))
+            .accounts({
+                userAccount,
+                reserveStakeAccount: RESERVE_STAKE_ACCOUNT,
+                user,
+                rewardAuthority: wallet.publicKey,
+                systemProgram: web3.SystemProgram.programId,
+            })
+            .rpc();
+
+        console.log(`Unstaked ${amount} lamports. Transaction signature: ${tx}`);
+    } catch (error) {
+        console.error('Error unstaking SOL:', error);
+    }
+}
