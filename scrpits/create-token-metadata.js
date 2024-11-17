@@ -37,8 +37,9 @@ const [metadata] = PublicKey.findProgramAddressSync(
 // Metadata Account IX Args
 const args = {
     data: {
-        name: "RAID",
+        name: "Remote AI Infrastructure Deployment",
         symbol: "RAID",
+        description: "The RAID token is an innovative utility token built on the Solana blockchain, designed to accelerate the growth of distributed machine learning by leveraging decentralized computing power. By enabling everyday users and investors to monetize their underutilized GPU resources, RAID transforms individual computers into valuable nodes in a global AI infrastructure. Allowing RAID to provide competitive compute prices to customers (competing with the likes of AWS and Microsoft), without comproimising on performance.",
         uri: "https://raw.githubusercontent.com/montyxrizzo/TestingRepo/refs/heads/main/metadata.json", // Increment version
         collection: null,
         creators: [
