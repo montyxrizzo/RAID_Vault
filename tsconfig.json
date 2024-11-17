@@ -3,5 +3,12 @@
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
     "types": ["three"]
+
+    //     "baseUrl": ".",
+    //     "paths": {
+    //       "@solana/spl-stake-pool": ["src/@types/@solana/spl-stake-pool"]
+
+    // }
+    
   }
 }

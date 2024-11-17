@@ -1,181 +1,189 @@
-import { PublicKey, Transaction, Connection, SystemProgram } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
-import { useEffect, useState } from 'react';
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+} from '@solana/web3.js';
+import { depositSol, withdrawSol } from '@solana/spl-stake-pool';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { AppHero, ellipsify } from '../ui/ui-layout';
-import { AccountBalance, AccountButtons, AccountTokens, AccountTransactions } from './account-ui';
+import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
-// Define constants
-const RAID_MINT_ADDRESS = 'BPFw62HkLiacp1h7MCitiWRZHpWSThxycDbVmn7rMUGx'; // Replace with actual mint
-const PROGRAM_ID = '6jqDCg61WsLqXeSDYSiv3s46USRGKvKskadScJvNYcPH'; // Replace with actual program ID
-const VAULT_PDA = 'CdFwDp8Mt2WbvaenKDKs99CjDsBqKwrFWTSSckkuNFmU'; // Replace with actual PDA
-const DECIMALS = 9;
+// Constants
+const STAKE_POOL_PROGRAM_ID = new PublicKey('CUZSoS7yQa2pYJ6g3VFNXVApN42sXLhiDKyosM4bKJkn'); // Replace with your stake pool program ID
+const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Replace with your stake pool ID
+const connection = new Connection('https://api.devnet.solana.com', 'processed');
 
 export default function AccountDetailFeature() {
   const { publicKey, sendTransaction, connected } = useWallet();
-  const [amountStaked, setAmountStaked] = useState<number>(0);
-  const [availableToStake, setAvailableToStake] = useState<number>(0);
-  const [stakingAmount, setStakingAmount] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
+  const [stakedAmount, setStakedAmount] = useState<number>(0);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [amountToStake, setAmountToStake] = useState<number>(0);
+  const [amountToWithdraw, setAmountToWithdraw] = useState<number>(0);
 
-  const connection = new Connection('https://api.devnet.solana.com', 'processed');
-
-  useEffect(() => {
-    if (publicKey) {
-      fetchWalletBalance();
-      fetchStakeBalance();
-    }
-  }, [publicKey]);
-
-  // Fetch available SOL balance
+  // Fetch wallet balance
   const fetchWalletBalance = async () => {
     if (!publicKey) return;
     try {
       const balance = await connection.getBalance(publicKey);
-      setAvailableToStake(balance / 1e9); // Convert lamports to SOL
+      setWalletBalance(balance / 1e9); // Convert lamports to SOL
     } catch (error) {
       console.error('Error fetching wallet balance:', error);
-      setError('Failed to fetch wallet balance.');
+      toast.error('Failed to fetch wallet balance.');
     }
   };
 
-  // Fetch staked balance from the stake pool
-  const fetchStakeBalance = async () => {
+  // Fetch staked balance
+  const fetchStakedBalance = async () => {
     if (!publicKey) return;
     try {
-      const stakeAccountInfo = await connection.getParsedAccountInfo(new PublicKey(VAULT_PDA));
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+        programId: TOKEN_PROGRAM_ID,
+      });
 
-      if (stakeAccountInfo.value) {
-        console.log('Stake Account Info:', stakeAccountInfo);
-        const stakedLamports = stakeAccountInfo.value.lamports || 0;
-        setAmountStaked(stakedLamports / 1e9); // Convert lamports to SOL
-      } else {
-        setAmountStaked(0);
-      }
+      const stakeTokenAccount = tokenAccounts.value.find(
+        (accountInfo) =>
+          accountInfo.account.data.parsed.info.mint === STAKE_POOL_ID.toBase58()
+      );
+
+      const balance =
+        stakeTokenAccount?.account.data.parsed.info.tokenAmount.uiAmount || 0;
+      setStakedAmount(balance);
     } catch (error) {
-      console.error('Error fetching stake balance:', error);
-      setError('Failed to fetch staked balance.');
+      console.error('Error fetching staked balance:', error);
+      toast.error('Failed to fetch staked balance.');
     }
   };
 
   // Stake SOL
-  const handleStake = async () => {
+  const stakeSol = async () => {
     if (!connected || !publicKey) {
-      setError('Wallet not connected.');
+      toast.error('Wallet not connected.');
       return;
     }
 
-    if (stakingAmount <= 0 || stakingAmount > availableToStake) {
-      setError('Invalid staking amount.');
+    if (amountToStake <= 0 || amountToStake > walletBalance) {
+      toast.error('Invalid staking amount.');
       return;
     }
 
     try {
-      setError(null);
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey(VAULT_PDA),
-          lamports: stakingAmount * 1e9, // Convert SOL to lamports
-        })
+      const lamports = amountToStake * 1e9;
+      const { instructions, signers } = await depositSol(
+        connection,
+        STAKE_POOL_ID,
+        publicKey,
+        lamports
       );
 
-      const signature = await sendTransaction(transaction, connection);
-      console.log('Stake Transaction Signature:', signature);
+      const transaction = new Transaction().add(...instructions);
 
+      const signature = await sendTransaction(transaction, connection, { signers });
       await connection.confirmTransaction(signature, 'processed');
-      toast.success(`Successfully staked ${stakingAmount} SOL.`);
+      toast.success(`Successfully staked ${amountToStake} SOL.`);
+
       fetchWalletBalance();
-      fetchStakeBalance();
-      setStakingAmount(0);
+      fetchStakedBalance();
+      setAmountToStake(0);
     } catch (error) {
       console.error('Error staking SOL:', error);
-      setError('Failed to stake SOL.');
+      toast.error('Failed to stake SOL.');
     }
   };
 
-  // Unstake SOL
-  const handleUnstake = async () => {
+  // Withdraw SOL
+  const withdrawStake = async () => {
     if (!connected || !publicKey) {
-      setError('Wallet not connected.');
+      toast.error('Wallet not connected.');
       return;
     }
 
-    if (stakingAmount <= 0 || stakingAmount > amountStaked) {
-      setError('Invalid unstaking amount.');
+    if (amountToWithdraw <= 0 || amountToWithdraw > stakedAmount) {
+      toast.error('Invalid withdrawal amount.');
       return;
     }
 
     try {
-      setError(null);
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: new PublicKey(VAULT_PDA),
-          toPubkey: publicKey,
-          lamports: stakingAmount * 1e9, // Convert SOL to lamports
-        })
+      const lamports = amountToWithdraw * 1e9;
+      const { instructions, signers } = await withdrawSol(
+        connection,
+        STAKE_POOL_ID,
+        publicKey,
+        publicKey,
+        lamports
       );
 
-      const signature = await sendTransaction(transaction, connection);
-      console.log('Unstake Transaction Signature:', signature);
+      const transaction = new Transaction().add(...instructions);
 
+      const signature = await sendTransaction(transaction, connection, { signers });
       await connection.confirmTransaction(signature, 'processed');
-      toast.success(`Successfully unstaked ${stakingAmount} SOL.`);
+      toast.success(`Successfully withdrew ${amountToWithdraw} SOL.`);
+
       fetchWalletBalance();
-      fetchStakeBalance();
-      setStakingAmount(0);
+      fetchStakedBalance();
+      setAmountToWithdraw(0);
     } catch (error) {
-      console.error('Error unstaking SOL:', error);
-      setError('Failed to unstake SOL.');
+      console.error('Error withdrawing SOL:', error);
+      toast.error('Failed to withdraw SOL.');
     }
   };
+
+  useEffect(() => {
+    if (connected) {
+      fetchWalletBalance();
+      fetchStakedBalance();
+    }
+  }, [connected]);
 
   return (
     <div>
       <ToastContainer />
-      <AppHero title={<AccountBalance address={publicKey!} />} subtitle={ellipsify(publicKey?.toString())}>
-        <AccountButtons address={publicKey!} />
-      </AppHero>
+      <div className="p-4 border rounded-lg shadow">
+        <h2 className="text-lg font-semibold mb-2">Account Details</h2>
+        <p>
+          <strong>Wallet Balance:</strong> {walletBalance} SOL
+        </p>
+        <p>
+          <strong>Staked Amount:</strong> {stakedAmount} Pool Tokens
+        </p>
+      </div>
 
-      <div className="space-y-8">
-        <AccountTokens address={publicKey!} />
-        <AccountTransactions address={publicKey!} />
+      <div className="p-4 border rounded-lg shadow mt-4">
+        <h2 className="text-lg font-semibold mb-2">Stake SOL</h2>
+        <input
+          type="number"
+          value={amountToStake}
+          onChange={(e) => setAmountToStake(Number(e.target.value))}
+          placeholder="Amount to Stake"
+          className="px-2 py-1 border rounded mr-2"
+        />
+        <button
+          onClick={stakeSol}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={amountToStake <= 0 || amountToStake > walletBalance}
+        >
+          Stake
+        </button>
+      </div>
 
-        <div className="p-4 border rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-2">Staking</h2>
-          <p>
-            <strong>Amount Staked:</strong> {amountStaked} SOL
-          </p>
-          <p>
-            <strong>Available to Stake:</strong> {availableToStake} SOL
-          </p>
-          <div className="flex items-center mt-4">
-            <input
-              type="number"
-              value={stakingAmount}
-              onChange={(e) => setStakingAmount(Number(e.target.value))}
-              placeholder="Amount"
-              className="px-2 py-1 border rounded mr-2"
-            />
-            <button
-              onClick={handleStake}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              disabled={stakingAmount <= 0 || stakingAmount > availableToStake}
-            >
-              Stake
-            </button>
-            <button
-              onClick={handleUnstake}
-              className="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              disabled={stakingAmount <= 0 || stakingAmount > amountStaked}
-            >
-              Unstake
-            </button>
-          </div>
-          {error && <p className="mt-4 text-red-500">{error}</p>}
-        </div>
+      <div className="p-4 border rounded-lg shadow mt-4">
+        <h2 className="text-lg font-semibold mb-2">Withdraw SOL</h2>
+        <input
+          type="number"
+          value={amountToWithdraw}
+          onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
+          placeholder="Amount to Withdraw"
+          className="px-2 py-1 border rounded mr-2"
+        />
+        <button
+          onClick={withdrawStake}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
+        >
+          Withdraw
+        </button>
       </div>
     </div>
   );
