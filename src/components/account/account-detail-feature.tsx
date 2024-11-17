@@ -376,62 +376,94 @@ const claimRewards = async (publicKey: PublicKey) => {
     }
   }, [connected]);
   return (
-    <div className="bg-gray-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
-      <ToastContainer />
-      {/* Account Details */}
-      <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Account Details</h2>
-        <div className="mb-4">
-          <p className="text-gray-300">
-            <strong>Wallet Balance:</strong> <span className="text-white">{walletBalance} SOL</span>
-          </p>
-          <p className="text-gray-300">
-            <strong>Staked Amount:</strong> <span className="text-white">{stakedAmount} Pool Tokens (Radiation)</span>
-          </p>
-          <p className="text-gray-300">
-            <strong>Claimable Rewards:</strong> 
-            <span className="text-teal-300">
-              {claimableRewards !== undefined 
-                ? ` ${claimableRewards.toFixed(10)} RAID` 
-                : " Loading..."}
-            </span>
-          </p>
-          <p className="text-gray-300">
-            <strong>APY:</strong> <span className="text-teal-400">{(apy * 100).toFixed(2)}%</span>
+
+      <div className="bg-gray-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
+        <ToastContainer />
+        {/* Header Section */}
+        <div className="max-w-3xl w-full text-center mb-8">
+          <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Community Staking Pool</h1>
+          <p className="text-gray-300 text-lg">
+            Join the RAID community-run staking pool on Solana. Stake your SOL to help secure the network, 
+            earn rewards, and receive <span className="text-teal-400 font-semibold">RADIATION</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens. 
+            These tokens can be used across Solana’s DeFi ecosystem to maximize your potential.
           </p>
         </div>
-        <button
-          onClick={() => {
-            if (!publicKey) {
-              toast.error("Wallet not connected."); 
-              return;
-            }
-            claimRewards(publicKey);
-          }}
-          className={`w-full py-2 px-4 font-medium rounded 
-            ${claimableRewards > 0 
-              ? "bg-teal-500 hover:bg-teal-600 text-white" 
-              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-          disabled={claimableRewards <= 0}
-        >
-          Claim RAID Rewards
-        </button>
-      </div>
-  
-      {/* Stake SOL */}
-      <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake SOL</h2>
-        <div className="flex items-center gap-2 mb-4">
-          <input
-            type="number"
-            value={amountToStake}
-            onChange={(e) => setAmountToStake(Number(e.target.value))}
-            placeholder="Amount to Stake"
-            className="w-full px-4 py-2 border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
-          />
+    
+        {/* Account Details */}
+        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Account Details</h2>
+          <div className="mb-4">
+            <p className="text-gray-300">
+              <strong>Wallet Balance:</strong> <span className="text-white">{walletBalance} SOL</span>
+            </p>
+            <p className="text-gray-300">
+              <strong>Staked Amount:</strong> <span className="text-white">{stakedAmount} Pool Tokens (Radiation)</span>
+            </p>
+            <p className="text-gray-300">
+              <strong>Claimable Rewards:</strong> 
+              <span className="text-teal-300">
+                {claimableRewards !== undefined 
+                  ? ` ${claimableRewards.toFixed(10)} RAID` 
+                  : " Loading..."}
+              </span>
+            </p>
+            <p className="text-gray-300">
+              <strong>APY:</strong> <span className="text-teal-400">{(apy * 100).toFixed(2)}%</span>
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              if (!publicKey) {
+                toast.error("Wallet not connected."); 
+                return;
+              }
+              claimRewards(publicKey);
+            }}
+            className={`w-full py-2 px-4 font-medium rounded 
+              ${claimableRewards > 0 
+                ? "bg-teal-500 hover:bg-teal-600 text-white" 
+                : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+            disabled={claimableRewards <= 0}
+          >
+            Claim RAID Rewards
+          </button>
+        </div>
+    
+        {/* Stake SOL */}
+        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake SOL</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="number"
+              value={amountToStake}
+              onChange={(e) => setAmountToStake(Number(e.target.value))}
+              placeholder="Amount to Stake"
+              className="w-full px-4 py-2 border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
+            />
+            <div className="flex gap-1">
+              <button
+                onClick={() => setAmountToStake(walletBalance * 0.25)}
+                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+              >
+                25%
+              </button>
+              <button
+                onClick={() => setAmountToStake(walletBalance * 0.5)}
+                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+              >
+                50%
+              </button>
+              <button
+                onClick={() => setAmountToStake(walletBalance)}
+                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+              >
+                MAX
+              </button>
+            </div>
+          </div>
           <button
             onClick={stakeSol}
-            className={`py-2 px-4 font-medium rounded 
+            className={`w-full py-2 px-4 font-medium rounded 
               ${amountToStake > 0 && amountToStake <= walletBalance 
                 ? "bg-teal-500 hover:bg-teal-600 text-white" 
                 : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
@@ -440,22 +472,42 @@ const claimRewards = async (publicKey: PublicKey) => {
             Stake
           </button>
         </div>
-      </div>
-  
-      {/* Withdraw SOL */}
-      <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Withdraw SOL</h2>
-        <div className="flex items-center gap-2 mb-4">
-          <input
-            type="number"
-            value={amountToWithdraw}
-            onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
-            placeholder="Amount to Withdraw"
-            className="w-full px-4 py-2 border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
-          />
+    
+        {/* Withdraw SOL */}
+        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Withdraw SOL</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="number"
+              value={amountToWithdraw}
+              onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
+              placeholder="Amount to Withdraw"
+              className="w-full px-4 py-2 border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
+            />
+            <div className="flex gap-1">
+              <button
+                onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
+                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+              >
+                25%
+              </button>
+              <button
+                onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
+                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+              >
+                50%
+              </button>
+              <button
+                onClick={() => setAmountToWithdraw(stakedAmount)}
+                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+              >
+                MAX
+              </button>
+            </div>
+          </div>
           <button
             onClick={withdrawStake}
-            className={`py-2 px-4 font-medium rounded 
+            className={`w-full py-2 px-4 font-medium rounded 
               ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
                 ? "bg-red-500 hover:bg-red-600 text-white" 
                 : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
@@ -464,23 +516,22 @@ const claimRewards = async (publicKey: PublicKey) => {
             Withdraw
           </button>
         </div>
+    
+        {/* Transaction History */}
+        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
+          {transactions.length > 0 ? (
+            <ul className="list-disc pl-5 text-gray-300">
+              {transactions.map((tx, index) => (
+                <li key={index} className="break-words">{tx}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-400 text-center">No transactions found.</p>
+          )}
+        </div>
       </div>
-  
-      {/* Transaction History */}
-      <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
-        {transactions.length > 0 ? (
-          <ul className="list-disc pl-5 text-gray-300">
-            {transactions.map((tx, index) => (
-              <li key={index} className="break-words">{tx}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-400 text-center">No transactions found.</p>
-        )}
-      </div>
-    </div>
-  );
-  
+    );
+    
   
 }
