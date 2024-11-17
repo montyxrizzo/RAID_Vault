@@ -3,7 +3,10 @@ import {
   PublicKey,
   Transaction,
 } from '@solana/web3.js';
-import { depositSol, withdrawSol } from '@solana/spl-stake-pool';
+import {
+  depositSol,
+  withdrawSol,
+} from '@solana/spl-stake-pool';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -109,13 +112,13 @@ export default function AccountDetailFeature() {
     }
 
     try {
-      const lamports = amountToWithdraw * 1e9;
+      const lamports = amountToWithdraw;
 
       const { instructions, signers } = await withdrawSol(
         connection,
         STAKE_POOL_ID,
         publicKey,
-        publicKey,
+        publicKey, // SOL destination account
         lamports
       );
 
