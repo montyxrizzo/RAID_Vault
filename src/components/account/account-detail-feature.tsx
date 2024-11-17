@@ -285,22 +285,23 @@ const claimRewards = async (publicKey: PublicKey) => {
     // Update to the new mint address and custom program ID
     const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
-    const BOSS_PUB_KEY = new PublicKey('H1SkWxyCZ1tAtSQ3xHaPrW5cs4N1EvJhpc7LCNtDN2sB')
+
+    // Mint authority (hard-coded for testing)
     const mintAuthorityKeypair = Keypair.fromSecretKey(
       Uint8Array.from([
-        50, 174, 46, 66, 193, 4, 111, 223, 135, 48, 242, 200, 215, 31, 125, 101, 121, 
-        75, 135, 207, 91, 180, 96, 79, 226, 62, 168, 111, 101, 210, 23, 157, 237, 216, 
-        27, 84, 223, 122, 169, 247, 14, 105, 151, 248, 87, 96, 173, 40, 218, 74, 83, 
+        50, 174, 46, 66, 193, 4, 111, 223, 135, 48, 242, 200, 215, 31, 125, 101, 121,
+        75, 135, 207, 91, 180, 96, 79, 226, 62, 168, 111, 101, 210, 23, 157, 237, 216,
+        27, 84, 223, 122, 169, 247, 14, 105, 151, 248, 87, 96, 173, 40, 218, 74, 83,
         177, 2, 32, 4, 122, 90, 171, 85, 7, 59, 211, 83, 42
       ])
     );
-    
+
     // Get the associated token account for the user
     const userTokenAccount = await getAssociatedTokenAddress(
       RAID_MINT_ADDRESS,
-      BOSS_PUB_KEY,
-      false, // Don't allow owner to close the account
-      CUSTOM_TOKEN_PROGRAM_ID // Specify your custom token program ID
+      publicKey,
+      false, // Don't allow the account to be closed
+      CUSTOM_TOKEN_PROGRAM_ID
     );
 
     console.log(`User's Token Account: ${userTokenAccount.toBase58()}`);
@@ -312,11 +313,11 @@ const claimRewards = async (publicKey: PublicKey) => {
     if (!userAccountExists) {
       transaction.add(
         createAssociatedTokenAccountInstruction(
-          REWARD_WALLET.publicKey, // Payer
+          publicKey, // Fee payer
           userTokenAccount, // Associated token account
-          BOSS_PUB_KEY, // Owner
+          publicKey, // Owner
           RAID_MINT_ADDRESS, // Mint
-          CUSTOM_TOKEN_PROGRAM_ID // Specify your custom token program ID
+          CUSTOM_TOKEN_PROGRAM_ID // Custom token program ID
         )
       );
     }
@@ -329,29 +330,36 @@ const claimRewards = async (publicKey: PublicKey) => {
       createMintToInstruction(
         RAID_MINT_ADDRESS,
         userTokenAccount,
-        BOSS_PUB_KEY,
+        mintAuthorityKeypair.publicKey, // Mint authority
         amountToMint,
-        [],
-        CUSTOM_TOKEN_PROGRAM_ID // Use your custom token program ID
+        [], // No multisig required
+        CUSTOM_TOKEN_PROGRAM_ID
       )
     );
 
-    console.log(`Transaction: ${transaction}`);
+    // Set the fee payer to the connected wallet
+    transaction.feePayer = publicKey;
 
-    // Send and confirm the transaction
-    const signature = await sendAndConfirmTransaction(connection, transaction, [
-      mintAuthorityKeypair,
-    ]);
+    // Fetch the latest blockhash for the transaction
+    const latestBlockhash = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = latestBlockhash.blockhash;
+
+    // Sign the transaction with the mint authority
+    transaction.partialSign(mintAuthorityKeypair);
+
+    // Send and confirm the transaction using the connected wallet
+    const signature = await sendTransaction(transaction, connection);
+    await connection.confirmTransaction(signature, 'processed');
 
     console.log(`Minted ${claimed_rewards} RAID to ${userTokenAccount.toBase58()}.`);
     console.log(`Transaction Signature: ${signature}`);
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
   } catch (error) {
     console.error('Error claiming rewards:', error);
-
     toast.error('Failed to claim rewards.');
   }
 };
+
 
   useEffect(() => {
     if (connected) {
