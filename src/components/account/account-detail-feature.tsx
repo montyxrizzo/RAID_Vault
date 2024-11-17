@@ -2,8 +2,10 @@ import {
   Connection,
   PublicKey,
   Transaction,
-
+SystemProgram,
+TransactionInstruction,
   Keypair,
+  sendAndConfirmTransaction
 } from '@solana/web3.js';
 import {
   depositSol,
@@ -11,9 +13,19 @@ import {
 } from '@solana/spl-stake-pool';
 import {
   getOrCreateAssociatedTokenAccount,
+  createTransferCheckedInstruction,
   createTransferInstruction,
+  createAssociatedTokenAccountInstruction,
+  getAccount,
+  createMintToCheckedInstruction,
+  getAssociatedTokenAddress,
+  mintToChecked,
   TOKEN_PROGRAM_ID,
+  NATIVE_MINT_2022,
+  createMintToInstruction,
 } from '@solana/spl-token';
+import fs from 'fs';
+
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -21,12 +33,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 // Constants
-const RAID_TOKEN_MINT = new PublicKey('mntWBdvPz3NuxFNtYtb1whQm3XeYDtbpyvT2dBjKsa6'); // RAID token mint
+const RAID_MINT_ADDRESS = new PublicKey('mntLAh1cgKwmBJBMG4aszeG5CMdZVV81hnc2C6vSEoz');
+const RAID_TOKEN_MINT = new PublicKey('mntLAh1cgKwmBJBMG4aszeG5CMdZVV81hnc2C6vSEoz'); // RAID token mint
 const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
 const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 const API_BASE_URL = 'http://localhost:8000'; // Replace with your backend URL
 const REWARDS_VAULT = new PublicKey('EvoH3MxRu2HrcZb9rYcFEngkXzCnQRUisfumVCDBDmLd');
+const DECIMALS = 9; // Number of decimals for RAID token
+const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+
 // const REWARDS_VAULT = new PublicKey('CDnv9mzdK8NVqh1NqrcpepoawXsKSxGcNLNeDTCteVSz'); // Rewards vault address
 const REWARD_WALLET = Keypair.fromSecretKey(
   Uint8Array.from([155,156,175,177,249,243,99,119,137,61,1,171,225,47,61,135,53,196,178,30,255,14,23,26,164,218,10,38,200,181,203,206,12,184,90,133,215,159,63,245,75,207,133,212,176,8,218,91,113,41,236,179,222,77,152,19,116,233,217,68,253,114,198,224])
@@ -74,7 +90,12 @@ export default function AccountDetailFeature() {
         poolTokenAccount?.account.data.parsed.info.tokenAmount.uiAmount || 0;
       setStakedAmount(balance);
       // Sync fetched data to the server
-     
+      if (balance === 0) {
+        console.log("No staked balance, skipping API call.");
+        setClaimableRewards(0);
+        return;
+      }
+  
     // Fetch claimable rewards from the server
     const response = await axios.get(
       `${API_BASE_URL}/staking-data/${publicKey.toBase58()}`
@@ -148,54 +169,54 @@ export default function AccountDetailFeature() {
 
 
 // Calculate and transfer RAID rewards
-const calculateAndTransferRaidRewards = async (lpTokenAmount: number): Promise<void> => {
-  if (!publicKey || lpTokenAmount <= 0) {
-    console.error('Invalid public key or LP token amount.');
-    return;
-  }
+// const calculateAndTransferRaidRewards = async (lpTokenAmount: number): Promise<void> => {
+//   if (!publicKey || lpTokenAmount <= 0) {
+//     console.error('Invalid public key or LP token amount.');
+//     return;
+//   }
 
-  try {
-    const rewardsRate = 0.1; // 10% rewards rate
-    const claimableRewards = lpTokenAmount * rewardsRate;
-    console.log(`Calculated Claimable Rewards: ${claimableRewards} RAID`);
+//   try {
+//     const rewardsRate = 0.1; // 10% rewards rate
+//     const claimableRewards = lpTokenAmount * rewardsRate;
+//     console.log(`Calculated Claimable Rewards: ${claimableRewards} RAID`);
 
-    // Ensure the rewards vault has an associated token account for the RAID mint
-    const rewardsVaultAccount = await getOrCreateAssociatedTokenAccount(
-      connection,
-      REWARD_WALLET, // Fee payer
-      RAID_TOKEN_MINT, // RAID mint
-      REWARDS_VAULT_AUTHORITY // Owner of the token account
-    );
+//     // Ensure the rewards vault has an associated token account for the RAID mint
+//     const rewardsVaultAccount = await getOrCreateAssociatedTokenAccount(
+//       connection,
+//       REWARD_WALLET, // Fee payer
+//       RAID_TOKEN_MINT, // RAID mint
+//       REWARDS_VAULT_AUTHORITY // Owner of the token account
+//     );
 
-    console.log("Rewards Vault Account:", rewardsVaultAccount.address.toBase58());
+//     console.log("Rewards Vault Account:", rewardsVaultAccount.address.toBase58());
 
-    // Transfer RAID directly to the user's wallet
-    const transferInstruction = createTransferInstruction(
-      rewardsVaultAccount.address, // Source account
-      publicKey, // User's Solana wallet address (RAID account created automatically if needed)
-      REWARDS_VAULT_AUTHORITY, // Authority of the source account
-      Math.floor(claimableRewards * 1e9), // Amount to transfer in smallest unit
-      [], // No multi-signers
-      TOKEN_PROGRAM_ID
-    );
+//     // Transfer RAID directly to the user's wallet
+//     const transferInstruction = createTransferInstruction(
+//       rewardsVaultAccount.address, // Source account
+//       publicKey, // User's Solana wallet address (RAID account created automatically if needed)
+//       REWARDS_VAULT_AUTHORITY, // Authority of the source account
+//       Math.floor(claimableRewards * 1e9), // Amount to transfer in smallest unit
+//       [], // No multi-signers
+//       TOKEN_PROGRAM_ID
+//     );
 
-    const transaction = new Transaction().add(transferInstruction);
-    const latestBlockhash = await connection.getLatestBlockhash();
-    transaction.feePayer = publicKey;
-    transaction.recentBlockhash = latestBlockhash.blockhash;
+//     const transaction = new Transaction().add(transferInstruction);
+//     const latestBlockhash = await connection.getLatestBlockhash();
+//     transaction.feePayer = publicKey;
+//     transaction.recentBlockhash = latestBlockhash.blockhash;
 
-    console.log("Sending transaction to transfer RAID rewards...");
-    const signature = await sendTransaction(transaction, connection, { signers: [REWARD_WALLET] });
-    await connection.confirmTransaction(signature, 'processed');
+//     console.log("Sending transaction to transfer RAID rewards...");
+//     const signature = await sendTransaction(transaction, connection, { signers: [REWARD_WALLET] });
+//     await connection.confirmTransaction(signature, 'processed');
 
-    console.log(`Transferred ${claimableRewards.toFixed(2)} RAID tokens to ${publicKey.toBase58()}.`);
-    setClaimableRewards(0); // Reset claimable rewards
-    toast.success(`Successfully transferred ${claimableRewards.toFixed(2)} RAID.`);
-  } catch (error) {
-    console.error("Error transferring RAID rewards:", error);
-    toast.error('Failed to transfer RAID rewards.');
-  }
-};
+//     console.log(`Transferred ${claimableRewards.toFixed(2)} RAID tokens to ${publicKey.toBase58()}.`);
+//     setClaimableRewards(0); // Reset claimable rewards
+//     toast.success(`Successfully transferred ${claimableRewards.toFixed(2)} RAID.`);
+//   } catch (error) {
+//     console.error("Error transferring RAID rewards:", error);
+//     toast.error('Failed to transfer RAID rewards.');
+//   }
+// };
 
 // Withdraw SOL and trigger RAID rewards transfer
 const withdrawStake = async () => {
@@ -239,20 +260,98 @@ const withdrawStake = async () => {
     toast.error("Failed to withdraw SOL.");
   }
 };
-const claimRewards = async () => {
-  if (!publicKey) return;
+
+const claimRewards = async (publicKey: PublicKey) => {
+  if (!publicKey) {
+    toast.error('Wallet not connected.');
+    return;
+  }
+
   try {
-    const response = await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/claim-rewards`);
+    // Fetch claimable rewards from the backend
+    const response = await axios.post(
+      `${API_BASE_URL}/staking-data/${publicKey.toBase58()}/claim-rewards`
+    );
     const { claimed_rewards } = response.data;
-    toast.success(`Successfully claimed ${claimed_rewards.toFixed(2)} RAID.`);
-    fetchStakedBalance(); // Refresh data after claiming
+
+    // Ensure rewards are greater than zero
+    if (claimed_rewards <= 0) {
+      toast.error('No rewards to claim.');
+      return;
+    }
+
+    console.log(`Claimable rewards: ${claimed_rewards}`);
+
+    // Update to the new mint address and custom program ID
+    const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
+    const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    const BOSS_PUB_KEY = new PublicKey('H1SkWxyCZ1tAtSQ3xHaPrW5cs4N1EvJhpc7LCNtDN2sB')
+    const mintAuthorityKeypair = Keypair.fromSecretKey(
+      Uint8Array.from([
+        50, 174, 46, 66, 193, 4, 111, 223, 135, 48, 242, 200, 215, 31, 125, 101, 121, 
+        75, 135, 207, 91, 180, 96, 79, 226, 62, 168, 111, 101, 210, 23, 157, 237, 216, 
+        27, 84, 223, 122, 169, 247, 14, 105, 151, 248, 87, 96, 173, 40, 218, 74, 83, 
+        177, 2, 32, 4, 122, 90, 171, 85, 7, 59, 211, 83, 42
+      ])
+    );
+    
+    // Get the associated token account for the user
+    const userTokenAccount = await getAssociatedTokenAddress(
+      RAID_MINT_ADDRESS,
+      BOSS_PUB_KEY,
+      false, // Don't allow owner to close the account
+      CUSTOM_TOKEN_PROGRAM_ID // Specify your custom token program ID
+    );
+
+    console.log(`User's Token Account: ${userTokenAccount.toBase58()}`);
+
+    const transaction = new Transaction();
+
+    // Check if the associated token account exists, and create one if necessary
+    const userAccountExists = await connection.getAccountInfo(userTokenAccount);
+    if (!userAccountExists) {
+      transaction.add(
+        createAssociatedTokenAccountInstruction(
+          REWARD_WALLET.publicKey, // Payer
+          userTokenAccount, // Associated token account
+          BOSS_PUB_KEY, // Owner
+          RAID_MINT_ADDRESS, // Mint
+          CUSTOM_TOKEN_PROGRAM_ID // Specify your custom token program ID
+        )
+      );
+    }
+
+    // Calculate the amount to mint in the smallest unit
+    const amountToMint = Math.floor(claimed_rewards * 10 ** DECIMALS);
+
+    // Add the mintTo instruction
+    transaction.add(
+      createMintToInstruction(
+        RAID_MINT_ADDRESS,
+        userTokenAccount,
+        BOSS_PUB_KEY,
+        amountToMint,
+        [],
+        CUSTOM_TOKEN_PROGRAM_ID // Use your custom token program ID
+      )
+    );
+
+    console.log(`Transaction: ${transaction}`);
+
+    // Send and confirm the transaction
+    const signature = await sendAndConfirmTransaction(connection, transaction, [
+      mintAuthorityKeypair,
+    ]);
+
+    console.log(`Minted ${claimed_rewards} RAID to ${userTokenAccount.toBase58()}.`);
+    console.log(`Transaction Signature: ${signature}`);
+    toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
   } catch (error) {
     console.error('Error claiming rewards:', error);
+
     toast.error('Failed to claim rewards.');
   }
 };
-
-
 
   useEffect(() => {
     if (connected) {
@@ -277,7 +376,7 @@ const claimRewards = async () => {
           <strong>Wallet Balance:</strong> {walletBalance} SOL
         </p>
         <p>
-          <strong>Staked Amount:</strong> {stakedAmount} Pool Tokens
+          <strong>Staked Amount:</strong> {stakedAmount} Pool Tokens (Radiation)
         </p>
         <p>
         <strong>Claimable Rewards:</strong> 
@@ -289,12 +388,19 @@ const claimRewards = async () => {
         <p><strong>APY:</strong> {(apy * 100).toFixed(2)}%</p>
         <br></br>
         <button
-          onClick={claimRewards}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          disabled={claimableRewards <= 0}
-        >
-          Claim RAID Rewards
-        </button>
+  onClick={() => {
+    if (!publicKey) {
+      toast.error("Wallet not connected."); // Notify user if wallet is not connected
+      return;
+    }
+    claimRewards(publicKey); // Pass the publicKey if it's available
+  }}
+  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+  disabled={claimableRewards <= 0}
+>
+  Claim RAID Rewards
+</button>
+
       </div>
       
 
