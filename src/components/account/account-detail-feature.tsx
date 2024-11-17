@@ -92,7 +92,7 @@ export default function AccountDetailFeature() {
       // Sync fetched data to the server
       if (balance === 0) {
         console.log("No staked balance, skipping API call.");
-        setClaimableRewards(0);
+        // setClaimableRewards(0);
         return;
       }
   
@@ -102,7 +102,7 @@ export default function AccountDetailFeature() {
     );
     const { amount_staked, staking_rewards } = response.data;
     console.log(response.data)
-      setClaimableRewards(staking_rewards  || 0);
+      setClaimableRewards(staking_rewards);
     } catch (error) {
       console.error('Error fetching staked balance:', error);
       toast.error('Failed to fetch staked balance.');
@@ -354,6 +354,7 @@ const claimRewards = async (publicKey: PublicKey) => {
     console.log(`Minted ${claimed_rewards} RAID to ${userTokenAccount.toBase58()}.`);
     console.log(`Transaction Signature: ${signature}`);
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
+    setClaimableRewards(0);
   } catch (error) {
     console.error('Error claiming rewards:', error);
     toast.error('Failed to claim rewards.');
