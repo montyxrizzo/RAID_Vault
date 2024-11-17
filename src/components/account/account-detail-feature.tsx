@@ -2,7 +2,6 @@ import {
   Connection,
   PublicKey,
   Transaction,
-  SystemProgram,
 } from '@solana/web3.js';
 import { depositSol, withdrawSol } from '@solana/spl-stake-pool';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -12,8 +11,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 // Constants
-const STAKE_POOL_PROGRAM_ID = new PublicKey('CUZSoS7yQa2pYJ6g3VFNXVApN42sXLhiDKyosM4bKJkn'); // Replace with your stake pool program ID
-const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Replace with your stake pool ID
+const STAKE_POOL_PROGRAM_ID = new PublicKey('CUZSoS7yQa2pYJ6g3VFNXVApN42sXLhiDKyosM4bKJkn'); // Stake pool program ID
+const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
+const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 
 export default function AccountDetailFeature() {
@@ -22,6 +22,7 @@ export default function AccountDetailFeature() {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [amountToStake, setAmountToStake] = useState<number>(0);
   const [amountToWithdraw, setAmountToWithdraw] = useState<number>(0);
+  const [transactions, setTransactions] = useState<string[]>([]);
 
   // Fetch wallet balance
   const fetchWalletBalance = async () => {
@@ -43,13 +44,13 @@ export default function AccountDetailFeature() {
         programId: TOKEN_PROGRAM_ID,
       });
 
-      const stakeTokenAccount = tokenAccounts.value.find(
+      const poolTokenAccount = tokenAccounts.value.find(
         (accountInfo) =>
-          accountInfo.account.data.parsed.info.mint === STAKE_POOL_ID.toBase58()
+          accountInfo.account.data.parsed.info.mint === POOL_TOKEN_MINT.toBase58()
       );
 
       const balance =
-        stakeTokenAccount?.account.data.parsed.info.tokenAmount.uiAmount || 0;
+        poolTokenAccount?.account.data.parsed.info.tokenAmount.uiAmount || 0;
       setStakedAmount(balance);
     } catch (error) {
       console.error('Error fetching staked balance:', error);
@@ -71,6 +72,7 @@ export default function AccountDetailFeature() {
 
     try {
       const lamports = amountToStake * 1e9;
+
       const { instructions, signers } = await depositSol(
         connection,
         STAKE_POOL_ID,
@@ -83,6 +85,7 @@ export default function AccountDetailFeature() {
       const signature = await sendTransaction(transaction, connection, { signers });
       await connection.confirmTransaction(signature, 'processed');
       toast.success(`Successfully staked ${amountToStake} SOL.`);
+      setTransactions((prev) => [`Staked: ${amountToStake} SOL (Tx: ${signature})`, ...prev]);
 
       fetchWalletBalance();
       fetchStakedBalance();
@@ -107,6 +110,7 @@ export default function AccountDetailFeature() {
 
     try {
       const lamports = amountToWithdraw * 1e9;
+
       const { instructions, signers } = await withdrawSol(
         connection,
         STAKE_POOL_ID,
@@ -120,6 +124,7 @@ export default function AccountDetailFeature() {
       const signature = await sendTransaction(transaction, connection, { signers });
       await connection.confirmTransaction(signature, 'processed');
       toast.success(`Successfully withdrew ${amountToWithdraw} SOL.`);
+      setTransactions((prev) => [`Withdrew: ${amountToWithdraw} SOL (Tx: ${signature})`, ...prev]);
 
       fetchWalletBalance();
       fetchStakedBalance();
@@ -184,6 +189,15 @@ export default function AccountDetailFeature() {
         >
           Withdraw
         </button>
+      </div>
+
+      <div className="p-4 border rounded-lg shadow mt-4">
+        <h2 className="text-lg font-semibold mb-2">Transaction History</h2>
+        <ul className="list-disc pl-5">
+          {transactions.map((tx, index) => (
+            <li key={index}>{tx}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
