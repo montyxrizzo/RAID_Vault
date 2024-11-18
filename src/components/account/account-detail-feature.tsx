@@ -2,29 +2,29 @@ import {
   Connection,
   PublicKey,
   Transaction,
-SystemProgram,
-TransactionInstruction,
+//SystemProgram,
+//TransactionInstruction,
   Keypair,
-  sendAndConfirmTransaction
+  //sendAndConfirmTransaction
 } from '@solana/web3.js';
 import {
   depositSol,
   withdrawSol,
 } from '@solana/spl-stake-pool';
 import {
-  getOrCreateAssociatedTokenAccount,
-  createTransferCheckedInstruction,
-  createTransferInstruction,
+  //getOrCreateAssociatedTokenAccount,
+  //createTransferCheckedInstruction,
+  //createTransferInstruction,
   createAssociatedTokenAccountInstruction,
-  getAccount,
-  createMintToCheckedInstruction,
+  // getAccount,
+  // createMintToCheckedInstruction,
   getAssociatedTokenAddress,
-  mintToChecked,
+  // mintToChecked,
   TOKEN_PROGRAM_ID,
-  NATIVE_MINT_2022,
+  // NATIVE_MINT_2022,
   createMintToInstruction,
 } from '@solana/spl-token';
-import fs from 'fs';
+// import fs from 'fs';
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
@@ -33,23 +33,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 // Constants
-const RAID_MINT_ADDRESS = new PublicKey('mntLAh1cgKwmBJBMG4aszeG5CMdZVV81hnc2C6vSEoz');
-const RAID_TOKEN_MINT = new PublicKey('mntLAh1cgKwmBJBMG4aszeG5CMdZVV81hnc2C6vSEoz'); // RAID token mint
+
 const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
 const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 const API_BASE_URL = 'http://localhost:8000'; // Replace with your backend URL
-const REWARDS_VAULT = new PublicKey('EvoH3MxRu2HrcZb9rYcFEngkXzCnQRUisfumVCDBDmLd');
 const DECIMALS = 9; // Number of decimals for RAID token
-const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 
-// const REWARDS_VAULT = new PublicKey('CDnv9mzdK8NVqh1NqrcpepoawXsKSxGcNLNeDTCteVSz'); // Rewards vault address
-const REWARD_WALLET = Keypair.fromSecretKey(
-  Uint8Array.from([155,156,175,177,249,243,99,119,137,61,1,171,225,47,61,135,53,196,178,30,255,14,23,26,164,218,10,38,200,181,203,206,12,184,90,133,215,159,63,245,75,207,133,212,176,8,218,91,113,41,236,179,222,77,152,19,116,233,217,68,253,114,198,224])
-);
-const REWARD_TRACKING_PROGRAM_ID = new PublicKey('58sp67CCFvpnbKtW1JnLa64FGR69ptep2wj1UfMEP9Z7');
-
-const REWARDS_VAULT_AUTHORITY = REWARD_WALLET.publicKey;
 
 export default function AccountDetailFeature() {
   const { publicKey, sendTransaction, connected } = useWallet();
@@ -60,7 +50,12 @@ export default function AccountDetailFeature() {
   const [amountToWithdraw, setAmountToWithdraw] = useState<number>(0);
   const [transactions, setTransactions] = useState<string[]>([]);
   const [apy, setApy] = useState<number>(0);
+  //const [isModalOpen, setIsModalOpen] = useState(true);
+  //const [canAccept, setCanAccept] = useState(false);
 
+
+    // Modal Scroll Handler
+    
   // Fetch wallet balance
   const fetchWalletBalance = async () => {
     if (!publicKey) return;
@@ -100,7 +95,7 @@ export default function AccountDetailFeature() {
     const response = await axios.get(
       `${API_BASE_URL}/staking-data/${publicKey.toBase58()}`
     );
-    const { amount_staked, staking_rewards } = response.data;
+    const {  staking_rewards } = response.data;
     console.log(response.data)
       setClaimableRewards(staking_rewards);
     } catch (error) {
@@ -233,7 +228,7 @@ const withdrawStake = async () => {
   try {
       
     // Convert SOL to lamports and ensure integer values
-    const lamports = amountToWithdraw;
+    const lamports = Math.floor(amountToWithdraw);
 
     const { instructions, signers } = await withdrawSol(
       connection,

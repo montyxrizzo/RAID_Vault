@@ -7,6 +7,7 @@ import viteTsconfigPaths from 'vite-tsconfig-paths' // https://vitejs.dev/config
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    outDir: "build",
     sourcemap: false,
     rollupOptions: {
       output: {
@@ -24,6 +25,7 @@ export default defineConfig({
           tabler: ['@tabler/icons-react'],
           tanstack: ['@tanstack/react-query'],
         },
+        
       },
     },
   },
@@ -35,9 +37,21 @@ export default defineConfig({
       plugins: [
         NodeGlobalsPolyfillPlugin({
           process: true,
+          
         }),
+        
       ],
     },
   },
   plugins: [viteTsconfigPaths(), react(), nodePolyfills()],
+  resolve: {
+    alias: [
+    {
+      find: './runtimeConfig',
+      replacement: './runtimeConfig.browser',
+    },
+  ]
+},
+//Add build if you are going to use a Git-based (Github or CodeCommit) deployement
+
 })

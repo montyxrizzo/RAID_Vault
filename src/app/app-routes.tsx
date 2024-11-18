@@ -11,9 +11,10 @@ const RoadmapFeature = lazy(() => import('../components/dashboard/roadmap'));
 
 const links: { label: string; path: string }[] = [
   { label: 'Staking', path: '/account' },
-  { label: 'Clusters', path: '/clusters' },
+
   { label: 'Roadmap', path: '/roadmap' }, // Add roadmap link
   { label: 'Whitepaper', path: '/whitepaper' }, // Add link to Whitepaper
+  { label: 'Clusters', path: '/clusters' },
 
 
 ]
