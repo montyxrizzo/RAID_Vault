@@ -106,34 +106,8 @@ export default function WhitepaperPage() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="text-center text-gray-400 border-t border-gray-700 mt-12 pt-8">
-          <h3 className="text-lg font-semibold">Contact</h3>
-          <p>
-            Website:{" "}
-            <a href="https://RAID-AI.com" className="text-indigo-400">
-              RAID-AI.com
-            </a>
-          </p>
-          <p>
-            GitHub:{" "}
-            <a href="https://github.com/raid-ai" className="text-indigo-400">
-              github.com/raid-ai
-            </a>
-          </p>
-          <p>
-            Twitter:{" "}
-            <a href="https://twitter.com/raid_ai" className="text-indigo-400">
-              @raid_ai
-            </a>
-          </p>
-          <p>
-            Discord:{" "}
-            <a href="https://discord.gg/raid" className="text-indigo-400">
-              RAID Community
-            </a>
-          </p>
-        </footer>
+    
+       
       </div>
     </div>
   );
