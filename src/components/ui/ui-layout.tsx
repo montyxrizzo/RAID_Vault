@@ -97,7 +97,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
                       pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""
                     }`}
                     to={path}
-                    onClick={() => setIsMenuOpen(false)} // Close menu on link click
+                    onClick={() => setIsMenuOpen(false)} // Close menu on link click 
                   >
                     {label}
                   </Link>
