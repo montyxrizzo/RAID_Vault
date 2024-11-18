@@ -1,4 +1,4 @@
-import { ReactNode, Suspense, useEffect, useRef } from 'react'
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -7,36 +7,127 @@ import { ClusterChecker, ClusterUiSelect, ExplorerLink } from '../cluster/cluste
 import { WalletButton } from '../solana/solana-provider'
 
 export function UiLayout({ children, links }: { children: ReactNode; links: { label: string; path: string }[] }) {
-  const pathname = useLocation().pathname
+  const pathname = useLocation().pathname;
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to toggle menu visibility
 
   return (
     <div className="h-full flex flex-col">
-      <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
-        <div className="flex-1">
-        <Link className="btn btn-ghost normal-case text-xl rounded-full" to="/">
-    <img className="h-15 md:h-10 rounded-full" alt="Logo" src="/logo.png" />
-</Link>
+      {/* Navbar */}
+      <nav className="navbar bg-base-300 text-neutral-content fixed top-0 left-0 right-0 z-50 shadow-md">
+        <div className="container mx-auto flex items-center justify-between px-4">
+      {/* Logo */}
+      <Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
+        <div className="relative">
+          {/* Animated Logo */}
+          <img
+            className="h-10 w-10 rounded-full shadow-lg ring-2 ring-indigo-500/70 animate-pulse"
+            alt="Logo"
+            src="/logo.png"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
+        </div>
+        <div
+          className="hidden md:inline-block text-base font-semibold bg-clip-text text-transparent 
+          bg-gradient-to-r from-green-400 via-purple-500 to-indigo-400 tracking-tight leading-snug"
+        >
+          Remote <span className="text-white">AI</span> Infrastructure
+          <br />
+          Deployment
+        </div>
+      </Link>
 
 
-          <ul className="menu menu-horizontal px-1 space-x-2">
+          {/* Hamburger Menu Button (visible on mobile only) */}
+          <button
+            className="btn btn-ghost md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          </button>
+
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex space-x-4 items-center">
             {links.map(({ label, path }) => (
               <li key={path}>
-                <Link className={pathname.startsWith(path) ? 'active' : ''} to={path}>
+                <Link
+                  className={`hover:text-indigo-400 ${pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""}`}
+                  to={path}
+                >
                   {label}
                 </Link>
               </li>
             ))}
+            <li>
+              <a
+                href="https://v2.raydium.io/swap/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-400 font-semibold"
+              >
+                #GET RAID
+              </a>
+            </li>
           </ul>
+
+          {/* Wallet and Cluster Select */}
+          <div className="hidden md:flex items-center space-x-2">
+            <WalletButton />
+            <ClusterUiSelect />
+          </div>
         </div>
-        <div className="flex-none space-x-2">
-          <WalletButton />
-          <ClusterUiSelect />
-        </div>
-      </div>
-      <ClusterChecker>
-        <AccountChecker />
-      </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto">
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-base-300 px-4 pt-2 pb-4 shadow-md">
+            <ul className="space-y-2">
+              {links.map(({ label, path }) => (
+                <li key={path}>
+                  <Link
+                    className={`block py-2 hover:text-indigo-400 ${
+                      pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""
+                    }`}
+                    to={path}
+                    onClick={() => setIsMenuOpen(false)} // Close menu on link click
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="https://v2.raydium.io/swap/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block py-2 text-green-400 font-semibold"
+                  onClick={() => setIsMenuOpen(false)} // Close menu on external link click
+                >
+                  #GET RAID
+                </a>
+              </li>
+            </ul>
+            <div className="mt-4 flex justify-end space-x-2">
+              <WalletButton />
+              <ClusterUiSelect />
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Page Content */}
+      <div className="mt-[72px] flex-grow mx-4 lg:mx-auto"> {/* Add margin-top to avoid overlap with fixed navbar */}
+        <ClusterChecker>
+          <AccountChecker />
+        </ClusterChecker>
         <Suspense
           fallback={
             <div className="text-center my-32">
@@ -48,23 +139,25 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
         </Suspense>
         <Toaster position="bottom-right" />
       </div>
+
+      {/* Footer */}
       <footer className="footer footer-center p-4 bg-base-300 text-base-content">
         <aside>
           <p>
-            Developed with ❤️ in Philadelphia{' '}
+            Developed with ❤️ in Philadelphia{" "}
             <a
               className="link hover:text-white"
               href=""
               target="_blank"
               rel="noopener noreferrer"
-            >
-            </a>
+            ></a>
           </p>
         </aside>
       </footer>
     </div>
-  )
+  );
 }
+
 
 export function AppModal({
   children,
@@ -86,6 +179,11 @@ export function AppModal({
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/x-icon';
+    link.href = '/favicon.ico'; // Update this to the correct path for your favicon
+    document.head.appendChild(link);
     if (!dialogRef.current) return
     if (show) {
       dialogRef.current.showModal()

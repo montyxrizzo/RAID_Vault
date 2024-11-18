@@ -5,11 +5,12 @@ import ParticleVisualization from './ParticleVisualization';
 
 const links = [
     { label: 'Community', href: 'https://solanacookbook.com/' },
-    { label: 'Rewards', href: 'https://faucet.solana.com/' },
+    { label: 'Whitepaper', href: 'https://github.com/solana-developers/' },
+    { label: 'Roadmap', href: 'https://faucet.solana.com/' },
     { label: 'Mining Documentation', href: 'https://docs.solana.com/' },
     { label: 'Client Documentation', href: 'https://faucet.solana.com/' },
-    { label: 'Development Team', href: 'https://solana.stackexchange.com/' },
-    { label: 'Whitepaper', href: 'https://github.com/solana-developers/' },
+    { label: 'Contact Us', href: 'https://solana.stackexchange.com/' },
+
 ];
 
 export default function DashboardFeature() {

@@ -132,7 +132,7 @@ export default function AccountDetailFeature() {
     }
 
     try {
-      const lamports = amountToStake * 1e9;
+      const lamports = Math.floor(amountToStake * 1e9);
 
       const { instructions, signers } = await depositSol(
         connection,
@@ -231,6 +231,8 @@ const withdrawStake = async () => {
   }
 
   try {
+      
+    // Convert SOL to lamports and ensure integer values
     const lamports = amountToWithdraw;
 
     const { instructions, signers } = await withdrawSol(
