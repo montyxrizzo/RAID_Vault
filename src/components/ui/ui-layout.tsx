@@ -88,8 +88,8 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-base-300 px-4 pt-2 pb-4 shadow-md">
-            <ul className="space-y-2">
+            <div className="md:hidden bg-base-300 px-4 pt-2 pb-4 shadow-md z-40">
+             <ul className="space-y-2">
               {links.map(({ label, path }) => (
                 <li key={path}>
                   <Link
