@@ -4,12 +4,13 @@ import { AppHero } from '../ui/ui-layout';
 import ParticleVisualization from './ParticleVisualization';
 
 const links = [
-    { label: 'Community', href: 'https://solanacookbook.com/' },
-    { label: 'Whitepaper', href: 'https://github.com/solana-developers/' },
-    { label: 'Roadmap', href: 'https://faucet.solana.com/' },
-    { label: 'Mining Documentation', href: 'https://docs.solana.com/' },
-    { label: 'Client Documentation', href: 'https://faucet.solana.com/' },
-    { label: 'Contact Us', href: 'https://solana.stackexchange.com/' },
+    { label: 'Community', href: 'https://discord.gg/GqcXHf3H' },
+    { label: 'Whitepaper', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/whitepaper/' },
+    { label: 'Roadmap', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/roadmap/' },
+    // { label: 'Mining Documentation', href: 'https://docs.solana.com/' },
+    // { label: 'Client Documentation', href: 'https://faucet.solana.com/' },
+    { label: 'Get RAID', href: 'https://v2.raydium.io/swap/',rel:"noopener noreferrer",
+        className:"text-green-400 font-semibold" },
 
 ];
 
@@ -57,14 +58,16 @@ export default function DashboardFeature() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
                     {links.map((link, index) => (
-                        <a
+                            <a
                             key={index}
                             href={link.href}
                             target="_blank"
-                            rel="noopener noreferrer"
-                            className="transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800"
+                            rel={link.rel || "noopener noreferrer"}
+                            className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+                                link.className || "text-white font-semibold"
+                            }`}
                         >
-                            <p className="text-white font-semibold">{link.label}</p>
+                            <p>{link.label}</p>
                         </a>
                     ))}
                 </div>
