@@ -330,17 +330,26 @@ const claimRewards = async (publicKey: PublicKey) => {
    
     //  console.log("Using API Secret:", apiSecret);
       // Your function logic here
+      // Ensure the environment variable is defined
+      if (!process.env.MINT_WALLET) {
+        throw new Error("MINT_WALLET is not defined in environment variables");
+      }
 
+      // Decode the Base64 string to a JSON string
+      const secretBase64 = process.env.MINT_WALLET!;
+      const jsonString = atob(secretBase64);
 
-      // Decode Base64 to Uint8Array
-      const secretBase64 = process.env.MINT_WALLET!; // Assert that SECRET_KEY is defined
-      const decodedSecret = atob(secretBase64);
-      const secretBytes = Uint8Array.from(decodedSecret, char => char.charCodeAt(0));
-      // console.log(secretBytes);
+      // Parse the JSON string into an array of numbers
+      const secretArray = JSON.parse(jsonString);
 
-      // console.log(decodedSecret);
-    // Mint authority (hard-coded for testing)
-    const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+      // Convert the array of numbers into a Uint8Array
+      const secretBytes = Uint8Array.from(secretArray);
+
+      // Create the Keypair from the secret bytes
+      const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+
+      // console.log("Mint authority keypair:", mintAuthorityKeypair.publicKey.toBase58());
+
   
     // Get the associated token account for the user
     const userTokenAccount = await getAssociatedTokenAddress(
