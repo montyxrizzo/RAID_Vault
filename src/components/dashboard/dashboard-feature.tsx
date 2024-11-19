@@ -7,9 +7,8 @@ const links = [
     { label: 'Community', href: 'https://discord.gg/GqcXHf3H' },
     { label: 'Whitepaper', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/whitepaper/' },
     { label: 'Roadmap', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/roadmap/' },
-    // { label: 'Mining Documentation', href: 'https://docs.solana.com/' },
     // { label: 'Client Documentation', href: 'https://faucet.solana.com/' },
-    { label: 'Get RAID', href: 'https://v2.raydium.io/swap/',rel:"noopener noreferrer",
+    { label: 'GPU Provider Program', href: 'https://github.com/montyxrizzo/GPU_Provider_Program',rel:"noopener noreferrer",
         className:"text-green-400 font-semibold" },
 
 ];
