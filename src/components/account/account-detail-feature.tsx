@@ -239,6 +239,7 @@ const calculateTvl = async () => {
 
 
 // Withdraw SOL and trigger RAID rewards transfer
+// Withdraw SOL and trigger RAID rewards transfer
 const withdrawStake = async () => {
   if (!connected || !publicKey) {
     toast.error("Wallet not connected.");
@@ -253,7 +254,10 @@ const withdrawStake = async () => {
   try {
       
     // Convert SOL to lamports and ensure integer values
-    const lamports = amountToWithdraw;
+    console.log(`Trying to withdraw ${amountToWithdraw} lamports`)
+    // const lamports = amountToWithdraw ;
+    const lamports = parseFloat(amountToWithdraw.toFixed(9)); // Correctly convert SOL to lamports
+    console.log(`Withdrawing ${lamports} lamports (${amountToWithdraw} SOL)`);
 
     const { instructions, signers } = await withdrawSol(
       connection,
@@ -481,94 +485,101 @@ const claimRewards = async (publicKey: PublicKey) => {
           </button>
         </div>
     
-        {/* Stake SOL */}
-        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake SOL</h2>
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="number"
-              value={amountToStake}
-              onChange={(e) => setAmountToStake(Number(e.target.value))}
-              placeholder="Amount to Stake"
-              className="w-full px-4 py-2 border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
-            />
-            <div className="flex gap-1">
-              <button
-                onClick={() => setAmountToStake(walletBalance * 0.25)}
-                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-              >
-                25%
-              </button>
-              <button
-                onClick={() => setAmountToStake(walletBalance * 0.5)}
-                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-              >
-                50%
-              </button>
-              <button
-                onClick={() => setAmountToStake(walletBalance - 0.001)}
-                className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-              >
-                MAX
-              </button>
-            </div>
-          </div>
-          <button
-            onClick={stakeSol}
-            className={`w-full py-2 px-4 font-medium rounded 
-              ${amountToStake > 0 && amountToStake <= walletBalance 
-                ? "bg-teal-500 hover:bg-teal-600 text-white" 
-                : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-            disabled={amountToStake <= 0 || amountToStake > walletBalance}
-          >
-            Stake
-          </button>
-        </div>
-    
-        {/* Withdraw SOL */}
-        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Withdraw SOL</h2>
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="number"
-              value={amountToWithdraw}
-              onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
-              placeholder="Amount to Withdraw"
-              className="w-full px-4 py-2 border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
-            />
-            <div className="flex gap-1">
-              <button
-                onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
-                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-              >
-                25%
-              </button>
-              <button
-                onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
-                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-              >
-                50%
-              </button>
-              <button
-                onClick={() => setAmountToWithdraw(stakedAmount)}
-                className="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700"
-              >
-                MAX
-              </button>
-            </div>
-          </div>
-          <button
-            onClick={withdrawStake}
-            className={`w-full py-2 px-4 font-medium rounded 
-              ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
-                ? "bg-red-500 hover:bg-red-600 text-white" 
-                : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-            disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
-          >
-            Withdraw
-          </button>
-        </div>
-    
+        <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake and Unstake SOL</h2>
+  
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {/* Stake SOL Section */}
+    <div className="bg-gray-900 p-4 rounded-lg shadow">
+      <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
+      <div className="mb-4">
+        <input
+          type="number"
+          value={amountToStake}
+          onChange={(e) => setAmountToStake(Number(e.target.value))}
+          placeholder="Amount to Stake"
+          className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
+        />
+      </div>
+      <div className="flex gap-2 justify-center mb-4">
+        <button
+          onClick={() => setAmountToStake(walletBalance * 0.25)}
+          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+        >
+          25%
+        </button>
+        <button
+          onClick={() => setAmountToStake(walletBalance * 0.5)}
+          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+        >
+          50%
+        </button>
+        <button
+          onClick={() => setAmountToStake(walletBalance - 0.001)}
+          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+        >
+          MAX
+        </button>
+      </div>
+      <button
+        onClick={stakeSol}
+        className={`w-full py-3 px-4 font-medium rounded 
+          ${amountToStake > 0 && amountToStake <= walletBalance 
+            ? "bg-teal-500 hover:bg-teal-600 text-white" 
+            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+        disabled={amountToStake <= 0 || amountToStake > walletBalance}
+      >
+        Stake
+      </button>
+    </div>
+
+    {/* Withdraw SOL Section */}
+    <div className="bg-gray-900 p-4 rounded-lg shadow">
+      <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
+      <div className="mb-4">
+        <input
+          type="number"
+          value={amountToWithdraw}
+          onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
+          placeholder="Amount to Withdraw"
+          className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
+        />
+      </div>
+      <div className="flex gap-2 justify-center mb-4">
+        <button
+          onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
+          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+        >
+          25%
+        </button>
+        <button
+          onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
+          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+        >
+          50%
+        </button>
+        <button
+          onClick={() => setAmountToWithdraw(stakedAmount)}
+          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+        >
+          MAX
+        </button>
+      </div>
+      <button
+        onClick={withdrawStake}
+        className={`w-full py-3 px-4 font-medium rounded 
+          ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
+            ? "bg-red-500 hover:bg-red-600 text-white" 
+            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+        disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
+      >
+        Withdraw
+      </button>
+    </div>
+  </div>
+</div>
+
+
         {/* Transaction History */}
         <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
