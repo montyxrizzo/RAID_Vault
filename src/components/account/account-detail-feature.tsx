@@ -228,7 +228,7 @@ const withdrawStake = async () => {
   try {
       
     // Convert SOL to lamports and ensure integer values
-    const lamports = Math.floor(amountToWithdraw);
+    const lamports = amountToWithdraw;
 
     const { instructions, signers } = await withdrawSol(
       connection,
