@@ -327,7 +327,7 @@ const claimRewards = async (publicKey: PublicKey) => {
     const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
     exports.handler = async () => {
-      const secret = process.env.MINT_WALLET; // Access the secret
+   
     //  console.log("Using API Secret:", apiSecret);
       // Your function logic here
 
