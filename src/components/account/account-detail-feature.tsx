@@ -326,17 +326,22 @@ const claimRewards = async (publicKey: PublicKey) => {
     // Update to the new mint address and custom program ID
     const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+    exports.handler = async () => {
+      const secret = process.env.MINT_WALLET; // Access the secret
+    //  console.log("Using API Secret:", apiSecret);
+      // Your function logic here
 
+
+      // Decode Base64 to Uint8Array
+      const secretBase64 = process.env.MINT_WALLET!; // Assert that SECRET_KEY is defined
+      const decodedSecret = atob(secretBase64);
+      const secretBytes = Uint8Array.from(decodedSecret, char => char.charCodeAt(0));
+      // console.log(secretBytes);
+
+      // console.log(decodedSecret);
     // Mint authority (hard-coded for testing)
-    const mintAuthorityKeypair = Keypair.fromSecretKey(
-      Uint8Array.from([
-        50, 174, 46, 66, 193, 4, 111, 223, 135, 48, 242, 200, 215, 31, 125, 101, 121,
-        75, 135, 207, 91, 180, 96, 79, 226, 62, 168, 111, 101, 210, 23, 157, 237, 216,
-        27, 84, 223, 122, 169, 247, 14, 105, 151, 248, 87, 96, 173, 40, 218, 74, 83,
-        177, 2, 32, 4, 122, 90, 171, 85, 7, 59, 211, 83, 42
-      ])
-    );
-
+    const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+  
     // Get the associated token account for the user
     const userTokenAccount = await getAssociatedTokenAddress(
       RAID_MINT_ADDRESS,
@@ -361,6 +366,7 @@ const claimRewards = async (publicKey: PublicKey) => {
           CUSTOM_TOKEN_PROGRAM_ID // Custom token program ID
         )
       );
+      
     }
 
     // Calculate the amount to mint in the smallest unit
@@ -397,10 +403,12 @@ const claimRewards = async (publicKey: PublicKey) => {
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
     setClaimableRewards(0);
     await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/rewards-claimed`);
+  };
   } catch (error) {
     console.error('Error claiming rewards:', error);
     toast.error('Failed to claim rewards.');
   }
+  
 };
 
 
