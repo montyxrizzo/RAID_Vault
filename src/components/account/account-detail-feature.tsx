@@ -50,7 +50,7 @@ export default function AccountDetailFeature() {
   const [claimableRewards, setClaimableRewards] = useState<number>(0);
   const [amountToStake, setAmountToStake] = useState<number>(0);
   const [amountToWithdraw, setAmountToWithdraw] = useState<number>(0);
-  // const [transactions, setTransactions] = useState<string[]>([]);
+  const [transactions, setTransactions] = useState<string[]>([]);
   const [apy, setApy] = useState<number>(0);
   const [tvl, setTvl] = useState<number>(0);
   const [solPrice, setSolPrice] = useState<number>(0);
