@@ -59,7 +59,10 @@ export default function AccountDetailFeature() {
 
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
-
+  const formatNumberWithCommas = (num: number): string => {
+    return new Intl.NumberFormat('en-US').format(Math.round(num));
+  };
+  
 // Fetch total SOL in the stake pool
 const fetchTotalSolInPool = async () => {
   try {
@@ -420,22 +423,22 @@ const claimRewards = async (publicKey: PublicKey) => {
             These tokens can be used across Solana’s DeFi ecosystem to maximize your potential.
           </p>
         </div>
-         {/* TVL Dashboard */}
-      <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
-        <p className="text-gray-300">
-          <strong>Total SOL in Pool:</strong>{' '}
-          <span className="text-white">{totalSolInPool.toFixed(2)} SOL</span>
-        </p>
-        <p className="text-gray-300">
-          <strong>SOL Price:</strong>{' '}
-          <span className="text-white">${solPrice.toFixed(2)} USD</span>
-        </p>
-        <p className="text-gray-300">
-          <strong>Total Value Locked (TVL):</strong>{' '}
-          <span className="text-teal-300">${tvl.toFixed(2)} USD</span>
-        </p>
-      </div>
+{/* TVL Dashboard */}
+<div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
+  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
+  <p className="text-gray-300">
+    <strong>Total SOL in Pool:</strong>{' '}
+    <span className="text-white">{formatNumberWithCommas(totalSolInPool)} SOL</span>
+  </p>
+  <p className="text-gray-300">
+    <strong>SOL Price:</strong>{' '}
+    <span className="text-white">${formatNumberWithCommas(solPrice)} USD</span>
+  </p>
+  <p className="text-gray-300">
+    <strong>Total Value Locked (TVL):</strong>{' '}
+    <span className="text-teal-300">${formatNumberWithCommas(tvl)} USD</span>
+  </p>
+</div>
 
     
         {/* Account Details */}
@@ -457,7 +460,7 @@ const claimRewards = async (publicKey: PublicKey) => {
               </span>
             </p>
             <p className="text-gray-300">
-              <strong>APY:</strong> <span className="text-teal-400">{(apy * 100).toFixed(2)}%</span>
+              <strong>Current APY:</strong> <span className="text-teal-400">{formatNumberWithCommas((apy * 100))}%</span>
             </p>
           </div>
           <button
