@@ -31,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { publicKey } from '@solana/spl-stake-pool/dist/codecs';
+// import { publicKey } from '@solana/spl-stake-pool/dist/codecs';
 
 // Constants
 const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
@@ -40,7 +40,7 @@ const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQs
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 const DECIMALS = 9; // Number of decimals for RAID token
-const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
+// const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
 
 
 export default function AccountDetailFeature() {
@@ -74,9 +74,7 @@ const fetchTotalSolInPool = async () => {
 
     try {
       // Adjust the offset based on the stake pool's data structure
-      const lamportsOffset = 73; // Example offset; adjust based on actual structure
-      // const totalStakeLamports = buffer.readBigUInt64LE(lamportsOffset); // Read the lamports value at the correct offset
-
+     
       // Convert lamports to SOL
       const solInPool = Number(buffer) / 1e9;
       setTotalSolInPool(solInPool);
