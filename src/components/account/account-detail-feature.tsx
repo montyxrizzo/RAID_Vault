@@ -39,6 +39,7 @@ const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEd
 const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
+// const API_BASE_URL = 'http://localhost:8001'
 const DECIMALS = 9; // Number of decimals for RAID token
 // const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
 
@@ -107,18 +108,25 @@ const fetchSolPrice = async () => {
   }
 
   try {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+    // Use the backend endpoint to fetch the SOL price
+    const response = await fetch(`${API_BASE_URL}/staking-data/sol-price`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch SOL price. Status: ${response.status}`);
+    }
+
     const data = await response.json();
-    const price = data.solana.usd;
+    const price = data.price; // Adjust this if your API returns a different structure
     setSolPrice(price);
     setLastPriceFetchTime(currentTime); // Update the last fetch time
-    console.log('Fetched new SOL price:', price);
+    console.log('Fetched new SOL price from backend:', price);
     return price;
   } catch (error) {
     console.error('Error fetching SOL price:', error);
     return solPrice; // Return the last known price if fetching fails
   }
 };
+
 
 // Calculate TVL
 const calculateTvl = async () => {
