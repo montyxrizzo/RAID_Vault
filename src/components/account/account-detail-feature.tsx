@@ -31,14 +31,16 @@ import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { publicKey } from '@solana/spl-stake-pool/dist/codecs';
 
 // Constants
-
+const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
 const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
 const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 const DECIMALS = 9; // Number of decimals for RAID token
+const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
 
 
 export default function AccountDetailFeature() {
@@ -50,9 +52,80 @@ export default function AccountDetailFeature() {
   const [amountToWithdraw, setAmountToWithdraw] = useState<number>(0);
   const [transactions, setTransactions] = useState<string[]>([]);
   const [apy, setApy] = useState<number>(0);
+  const [tvl, setTvl] = useState<number>(0);
+  const [solPrice, setSolPrice] = useState<number>(0);
+  const [totalSolInPool, setTotalSolInPool] = useState<number>(0);
+  const [lastPriceFetchTime, setLastPriceFetchTime] = useState<number>(0); // Stores the last fetch timestamp
+
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
 
+// Fetch total SOL in the stake pool
+const fetchTotalSolInPool = async () => {
+  try {
+    const accountInfo = await connection.getParsedAccountInfo(STAKE_ACCOUNT);
+
+    if (!accountInfo || !accountInfo.value?.lamports) {
+      throw new Error('Stake pool account not found or contains no data');
+      
+    }
+
+    const buffer = accountInfo.value.lamports || 0;
+
+    try {
+      // Adjust the offset based on the stake pool's data structure
+      const lamportsOffset = 73; // Example offset; adjust based on actual structure
+      // const totalStakeLamports = buffer.readBigUInt64LE(lamportsOffset); // Read the lamports value at the correct offset
+
+      // Convert lamports to SOL
+      const solInPool = Number(buffer) / 1e9;
+      setTotalSolInPool(solInPool);
+
+      console.log('Total SOL in Pool:', solInPool);
+      return solInPool;
+    } catch (parseError) {
+      console.error('Error parsing stake pool account data:', parseError);
+      throw new Error('Unable to parse raw buffer data');
+    }
+  } catch (error) {
+    console.error('Error fetching total SOL in pool:', error);
+    toast.error('Failed to fetch total SOL in pool.');
+    return 0;
+  }
+};
+
+// Fetch SOL price from CoinGecko
+
+const fetchSolPrice = async () => {
+  const currentTime = Date.now();
+  const thirtyMinutesInMs = 30 * 60 * 1000;
+
+  if (currentTime - lastPriceFetchTime < thirtyMinutesInMs && solPrice > 0) {
+    console.log('Using cached SOL price');
+    return solPrice;
+  }
+
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+    const data = await response.json();
+    const price = data.solana.usd;
+    setSolPrice(price);
+    setLastPriceFetchTime(currentTime); // Update the last fetch time
+    console.log('Fetched new SOL price:', price);
+    return price;
+  } catch (error) {
+    console.error('Error fetching SOL price:', error);
+    return solPrice; // Return the last known price if fetching fails
+  }
+};
+
+// Calculate TVL
+const calculateTvl = async () => {
+  const solQuantity = await fetchTotalSolInPool();
+  const solPrice = await fetchSolPrice();
+  const calculatedTvl = solQuantity * solPrice;
+  setTvl(calculatedTvl);
+};
 
     // Modal Scroll Handler
     
@@ -163,55 +236,6 @@ export default function AccountDetailFeature() {
   };
 
 
-// Calculate and transfer RAID rewards
-// const calculateAndTransferRaidRewards = async (lpTokenAmount: number): Promise<void> => {
-//   if (!publicKey || lpTokenAmount <= 0) {
-//     console.error('Invalid public key or LP token amount.');
-//     return;
-//   }
-
-//   try {
-//     const rewardsRate = 0.1; // 10% rewards rate
-//     const claimableRewards = lpTokenAmount * rewardsRate;
-//     console.log(`Calculated Claimable Rewards: ${claimableRewards} RAID`);
-
-//     // Ensure the rewards vault has an associated token account for the RAID mint
-//     const rewardsVaultAccount = await getOrCreateAssociatedTokenAccount(
-//       connection,
-//       REWARD_WALLET, // Fee payer
-//       RAID_TOKEN_MINT, // RAID mint
-//       REWARDS_VAULT_AUTHORITY // Owner of the token account
-//     );
-
-//     console.log("Rewards Vault Account:", rewardsVaultAccount.address.toBase58());
-
-//     // Transfer RAID directly to the user's wallet
-//     const transferInstruction = createTransferInstruction(
-//       rewardsVaultAccount.address, // Source account
-//       publicKey, // User's Solana wallet address (RAID account created automatically if needed)
-//       REWARDS_VAULT_AUTHORITY, // Authority of the source account
-//       Math.floor(claimableRewards * 1e9), // Amount to transfer in smallest unit
-//       [], // No multi-signers
-//       TOKEN_PROGRAM_ID
-//     );
-
-//     const transaction = new Transaction().add(transferInstruction);
-//     const latestBlockhash = await connection.getLatestBlockhash();
-//     transaction.feePayer = publicKey;
-//     transaction.recentBlockhash = latestBlockhash.blockhash;
-
-//     console.log("Sending transaction to transfer RAID rewards...");
-//     const signature = await sendTransaction(transaction, connection, { signers: [REWARD_WALLET] });
-//     await connection.confirmTransaction(signature, 'processed');
-
-//     console.log(`Transferred ${claimableRewards.toFixed(2)} RAID tokens to ${publicKey.toBase58()}.`);
-//     setClaimableRewards(0); // Reset claimable rewards
-//     toast.success(`Successfully transferred ${claimableRewards.toFixed(2)} RAID.`);
-//   } catch (error) {
-//     console.error("Error transferring RAID rewards:", error);
-//     toast.error('Failed to transfer RAID rewards.');
-//   }
-// };
 
 // Withdraw SOL and trigger RAID rewards transfer
 const withdrawStake = async () => {
@@ -361,15 +385,28 @@ const claimRewards = async (publicKey: PublicKey) => {
 
   useEffect(() => {
     if (connected) {
+      fetchSolPrice(); // Initial fetch
       fetchWalletBalance();
       fetchStakedBalance();
       fetchApy();
-         // Periodically refresh claimable rewards
-         const interval = setInterval(() => {
-          fetchStakedBalance();
-        }, 30000); // Refresh every 30 seconds
+      calculateTvl();
+      // Fetch SOL price every 30 minutes
+      const priceInterval = setInterval(fetchSolPrice, 30 * 60 * 1000);
+
+      // Refresh staked balance and TVL every 30 seconds
+      const rewardsInterval = setInterval(() => {
+        fetchWalletBalance();
+      fetchStakedBalance();
+      fetchApy();
+      calculateTvl();
+      }, 30000);
+
+
   
-        return () => clearInterval(interval);
+        return () => {
+          clearInterval(priceInterval);
+          clearInterval(rewardsInterval);
+        };
     }
   }, [connected]);
   return (
@@ -385,6 +422,23 @@ const claimRewards = async (publicKey: PublicKey) => {
             These tokens can be used across Solana’s DeFi ecosystem to maximize your potential.
           </p>
         </div>
+         {/* TVL Dashboard */}
+      <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
+        <p className="text-gray-300">
+          <strong>Total SOL in Pool:</strong>{' '}
+          <span className="text-white">{totalSolInPool.toFixed(2)} SOL</span>
+        </p>
+        <p className="text-gray-300">
+          <strong>SOL Price:</strong>{' '}
+          <span className="text-white">${solPrice.toFixed(2)} USD</span>
+        </p>
+        <p className="text-gray-300">
+          <strong>Total Value Locked (TVL):</strong>{' '}
+          <span className="text-teal-300">${tvl.toFixed(2)} USD</span>
+        </p>
+      </div>
+
     
         {/* Account Details */}
         <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
