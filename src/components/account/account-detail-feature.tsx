@@ -381,6 +381,7 @@ const claimRewards = async (publicKey: PublicKey) => {
     console.log(`Transaction Signature: ${signature}`);
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
     setClaimableRewards(0);
+    await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/rewards-claimed`);
   } catch (error) {
     console.error('Error claiming rewards:', error);
     toast.error('Failed to claim rewards.');
