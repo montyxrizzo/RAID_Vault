@@ -215,7 +215,7 @@ const calculateTvl = async () => {
       const signature = await sendTransaction(transaction, connection, { signers });
       await connection.confirmTransaction(signature, 'processed');
       toast.success(`Successfully staked ${amountToStake} SOL.`);
-      setTransactions((prev) => [`Staked: ${amountToStake} SOL (Tx: ${signature})`, ...prev]);
+      // setTransactions((prev) => [`Staked: ${amountToStake} SOL (Tx: ${signature})`, ...prev]);
       
       try {
         await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/deposit`, {
@@ -271,7 +271,7 @@ const withdrawStake = async () => {
     const signature = await sendTransaction(transaction, connection, { signers });
     await connection.confirmTransaction(signature, "processed");
     toast.success(`Successfully withdrew ${amountToWithdraw} SOL.`);
-    setTransactions((prev) => [`Withdrew: ${amountToWithdraw} SOL (Tx: ${signature})`, ...prev]);
+    // setTransactions((prev) => [`Withdrew: ${amountToWithdraw} SOL (Tx: ${signature})`, ...prev]);
 
       // Sync withdrawal data to the server
       await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/withdraw`, {
