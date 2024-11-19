@@ -451,7 +451,7 @@ const claimRewards = async (publicKey: PublicKey) => {
                 50%
               </button>
               <button
-                onClick={() => setAmountToStake(walletBalance)}
+                onClick={() => setAmountToStake(walletBalance - 0.001)}
                 className="px-3 py-1 bg-teal-600 text-white rounded-full hover:bg-teal-700"
               >
                 MAX
