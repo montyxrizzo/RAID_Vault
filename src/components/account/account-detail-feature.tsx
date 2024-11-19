@@ -581,7 +581,7 @@ const claimRewards = async (publicKey: PublicKey) => {
 
 
         {/* Transaction History */}
-        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
+        {/* <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
           {transactions.length > 0 ? (
             <ul className="list-disc pl-5 text-gray-300">
@@ -592,7 +592,7 @@ const claimRewards = async (publicKey: PublicKey) => {
           ) : (
             <p className="text-gray-400 text-center">No transactions found.</p>
           )}
-        </div>
+        </div> */}
       </div>
     );
     
