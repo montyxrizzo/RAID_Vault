@@ -26,6 +26,7 @@ import {
 } from '@solana/spl-token';
 // import fs from 'fs';
 
+
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -38,8 +39,8 @@ const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHT
 const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
 const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 const connection = new Connection('https://api.devnet.solana.com', 'processed');
-const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
-// const API_BASE_URL = 'http://localhost:8001'
+// const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
+const API_BASE_URL = 'http://localhost:8001'
 const DECIMALS = 9; // Number of decimals for RAID token
 // const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
 
@@ -302,6 +303,31 @@ const withdrawStake = async () => {
   }
 };
 
+async function getMintAuthorityKeypair() {
+  try {
+    // Explicitly define the base URL if needed
+    const response = await axios.get(`${API_BASE_URL}/staking-data/secret`); // Replace with the actual backend URL if necessary
+    console.log('Response:', response);
+
+    const { key } = response.data;
+
+    if (!key) {
+      throw new Error('Secret key is not defined in the backend response');
+    }
+
+    // Parse the key string into a Uint8Array
+    const secretArray = JSON.parse(key);
+    const secretBytes = Uint8Array.from(secretArray);
+
+    // Create the Keypair from the secret bytes
+    const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+
+    return mintAuthorityKeypair;
+  } catch (error) {
+    console.error('Error fetching or processing the secret key:', error);
+    throw error;
+  }
+}
 const claimRewards = async (publicKey: PublicKey) => {
   if (!publicKey) {
     toast.error('Wallet not connected.');
@@ -327,16 +353,9 @@ const claimRewards = async (publicKey: PublicKey) => {
     const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 
-      const secretBase64 = process.env.MINT_WALLET;
   
-      if (!secretBase64) {
-        throw new Error('MINT_WALLET is not defined in environment variables');
-      }
-  
-      const jsonString = Buffer.from(secretBase64, 'base64').toString('utf-8');
-      const secretArray = JSON.parse(jsonString);
-      const secretBytes = Uint8Array.from(secretArray);
-      const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+     
+      const mintAuthorityKeypair  = await getMintAuthorityKeypair();
   
       console.log('Mint Authority Keypair:', mintAuthorityKeypair.publicKey.toBase58());
   
