@@ -326,30 +326,20 @@ const claimRewards = async (publicKey: PublicKey) => {
     // Update to the new mint address and custom program ID
     const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
-    exports.handler = async () => {
-   
-    //  console.log("Using API Secret:", apiSecret);
-      // Your function logic here
-      // Ensure the environment variable is defined
-      if (!process.env.MINT_WALLET) {
-        throw new Error("MINT_WALLET is not defined in environment variables");
+
+      const secretBase64 = process.env.MINT_WALLET;
+  
+      if (!secretBase64) {
+        throw new Error('MINT_WALLET is not defined in environment variables');
       }
-
-      // Decode the Base64 string to a JSON string
-      const secretBase64 = process.env.MINT_WALLET!;
-      const jsonString = atob(secretBase64);
-
-      // Parse the JSON string into an array of numbers
+  
+      const jsonString = Buffer.from(secretBase64, 'base64').toString('utf-8');
       const secretArray = JSON.parse(jsonString);
-
-      // Convert the array of numbers into a Uint8Array
       const secretBytes = Uint8Array.from(secretArray);
-
-      // Create the Keypair from the secret bytes
       const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
-
-      // console.log("Mint authority keypair:", mintAuthorityKeypair.publicKey.toBase58());
-
+  
+      console.log('Mint Authority Keypair:', mintAuthorityKeypair.publicKey.toBase58());
+  
   
     // Get the associated token account for the user
     const userTokenAccount = await getAssociatedTokenAddress(
@@ -412,7 +402,7 @@ const claimRewards = async (publicKey: PublicKey) => {
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
     setClaimableRewards(0);
     await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/rewards-claimed`);
-  };
+
   } catch (error) {
     console.error('Error claiming rewards:', error);
     toast.error('Failed to claim rewards.');
