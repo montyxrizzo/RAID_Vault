@@ -1,0 +1,26 @@
+version: 1
+frontend:
+    phases:
+        preBuild:
+            commands:
+                - echo "Installing dependencies..."
+                - npm install
+                - echo "Printing environment variables for debugging:"
+                - printenv # Logs all environment variables for debugging
+                - echo "Checking if MINT_WALLET is set:"
+                - if [ -z "$MINT_WALLET" ]; then echo "MINT_WALLET is not set!"; exit 1; fi
+                - echo "MINT_WALLET is set"
+        build:
+            commands:
+                - echo "Building application..."
+                - npm run build # Ensure this script exists in `package.json`
+                # Write MINT_WALLET to .env file for use in frontend
+                - echo "Writing MINT_WALLET to .env file"
+                - echo "MINT_WALLET=$MINT_WALLET" >> .env
+    artifacts:
+        baseDirectory: build # Ensure this matches your actual output directory
+        files:
+            - '**/*'
+    cache:
+        paths:
+            - 'node_modules/**/*'
