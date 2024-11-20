@@ -16,15 +16,14 @@ import {
   //createTransferCheckedInstruction,
   //createTransferInstruction,
   createAssociatedTokenAccountInstruction,
-  // getAccount,
-  // createMintToCheckedInstruction,
+
   getAssociatedTokenAddress,
-  // mintToChecked,
+
   TOKEN_PROGRAM_ID,
-  // NATIVE_MINT_2022,
+
   createMintToInstruction,
 } from '@solana/spl-token';
-// import fs from 'fs';
+
 
 
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -58,6 +57,7 @@ export default function AccountDetailFeature() {
   const [solPrice, setSolPrice] = useState<number>(0);
   const [totalSolInPool, setTotalSolInPool] = useState<number>(0);
   const [lastPriceFetchTime, setLastPriceFetchTime] = useState<number>(0); // Stores the last fetch timestamp
+  const [activeView, setActiveView] = useState<"SOL Stake Pool" | "SOL/RAID LP">("SOL Stake Pool");
 
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
@@ -528,113 +528,164 @@ const claimRewards = async (publicKey: PublicKey) => {
         </div>
     
         <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake and Unstake SOL</h2>
+  {/* <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Vaults</h2> */}
   
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {/* Stake SOL Section */}
-    <div className="bg-gray-900 p-4 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
-      <div className="mb-4">
-        <input
-          type="number"
-          value={amountToStake}
-          onChange={(e) => setAmountToStake(Number(e.target.value))}
-          placeholder="Amount to Stake"
-          className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
-        />
-      </div>
-      <div className="flex gap-2 justify-center mb-4">
-        <button
-          onClick={() => setAmountToStake(walletBalance * 0.25)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          25%
-        </button>
-        <button
-          onClick={() => setAmountToStake(walletBalance * 0.5)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          50%
-        </button>
-        <button
-          onClick={() => setAmountToStake(walletBalance - 0.001)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          MAX
-        </button>
-      </div>
-      <button
-        onClick={stakeSol}
-        className={`w-full py-3 px-4 font-medium rounded 
-          ${amountToStake > 0 && amountToStake <= walletBalance 
-            ? "bg-teal-500 hover:bg-teal-600 text-white" 
-            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-        disabled={amountToStake <= 0 || amountToStake > walletBalance}
-      >
-        Stake
-      </button>
-    </div>
 
-    {/* Withdraw SOL Section */}
-    <div className="bg-gray-900 p-4 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
-      <div className="mb-4">
-        <input
-          type="number"
-          value={amountToWithdraw}
-          onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
-          placeholder="Amount to Withdraw"
-          className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
-        />
+    {/* Header */}
+    <div className="max-w-3xl w-full text-center mb-8">
+        <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Vault</h1>
+        <p className="text-gray-300 text-lg">
+          Switch between staking SOL in the RAID Community Stake Pool or managing your RAID/SOL LP tokens.
+        </p>
       </div>
-      <div className="flex gap-2 justify-center mb-4">
+
+      {/* Toggle Switch */}
+      <div className="flex justify-center items-center mb-6">
         <button
-          onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          className={`px-4 py-2 font-semibold rounded-l ${
+            activeView === "SOL Stake Pool"
+              ? "bg-teal-500 text-white"
+              : "bg-gray-700 text-gray-300"
+          }`}
+          onClick={() => setActiveView("SOL Stake Pool")}
         >
-          25%
+          Sol Stake Pool
         </button>
         <button
-          onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          className={`px-4 py-2 font-semibold rounded-r ${
+            activeView === "SOL/RAID LP"
+              ? "bg-teal-500 text-white"
+              : "bg-gray-700 text-gray-300"
+          }`}
+          onClick={() => setActiveView("SOL/RAID LP")}
         >
-          50%
-        </button>
-        <button
-          onClick={() => setAmountToWithdraw(stakedAmount)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-        >
-          MAX
+          RAID/SOL LP
         </button>
       </div>
-      <button
-        onClick={withdrawStake}
-        className={`w-full py-3 px-4 font-medium rounded 
-          ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
-            ? "bg-red-500 hover:bg-red-600 text-white" 
-            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-        disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
-      >
-        Withdraw
-      </button>
+
+     {/* Conditional Views */}
+{activeView === "SOL Stake Pool" && (
+  <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+
+    {/* Responsive Container for Stake and Withdraw Sections */}
+    <div className="flex flex-col lg:flex-row lg:gap-6">
+      {/* Stake SOL Section */}
+      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+        <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
+        <div className="mb-4">
+          <input
+            type="number"
+            value={amountToStake}
+            onChange={(e) => setAmountToStake(Number(e.target.value))}
+            placeholder="Amount to Stake"
+            className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
+          />
+        </div>
+        <div className="flex gap-2 justify-center mb-4">
+          <button
+            onClick={() => setAmountToStake(walletBalance * 0.25)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            25%
+          </button>
+          <button
+            onClick={() => setAmountToStake(walletBalance * 0.5)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            50%
+          </button>
+          <button
+            onClick={() => setAmountToStake(walletBalance - 0.001)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            MAX
+          </button>
+        </div>
+        <button
+          onClick={stakeSol}
+          className={`w-full py-3 px-4 font-medium rounded 
+            ${amountToStake > 0 && amountToStake <= walletBalance 
+              ? "bg-teal-500 hover:bg-teal-600 text-white" 
+              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+          disabled={amountToStake <= 0 || amountToStake > walletBalance}
+        >
+          Stake
+        </button>
+      </div>
+
+      {/* Withdraw SOL Section */}
+      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+        <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
+        <div className="mb-4">
+          <input
+            type="number"
+            value={amountToWithdraw}
+            onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
+            placeholder="Amount to Withdraw"
+            className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
+          />
+        </div>
+        <div className="flex gap-2 justify-center mb-4">
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            25%
+          </button>
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            50%
+          </button>
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            MAX
+          </button>
+        </div>
+        <button
+          onClick={withdrawStake}
+          className={`w-full py-3 px-4 font-medium rounded 
+            ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
+              ? "bg-red-500 hover:bg-red-600 text-white" 
+              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+          disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
+        >
+          Withdraw
+        </button>
+      </div>
     </div>
   </div>
-</div>
+)}
 
+      {activeView === "SOL/RAID LP" && (
+        <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">RAID/SOL LP</h2>
+          <div className="mb-4">
+            <p className="text-gray-300">
+              <strong>Wallet Balance:</strong> <span className="text-white">- RAID/SOL LP Tokens</span>
+            </p>
+          </div>
+          <button
+            disabled
+            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed"
+          >
+            Deposit LP Tokens (Coming Soon)
+          </button>
+          <button
+            disabled
+            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed mt-4"
+          >
+            Withdraw LP Tokens (Coming Soon)
+          </button>
+        </div>
+      )}
+    </div>
 
-        {/* Transaction History */}
-        {/* <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
-          {transactions.length > 0 ? (
-            <ul className="list-disc pl-5 text-gray-300">
-              {transactions.map((tx, index) => (
-                <li key={index} className="break-words">{tx}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-400 text-center">No transactions found.</p>
-          )}
-        </div> */}
+    </div>
       </div>
     );
     
