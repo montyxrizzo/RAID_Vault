@@ -16,15 +16,15 @@ import {
   //createTransferCheckedInstruction,
   //createTransferInstruction,
   createAssociatedTokenAccountInstruction,
-  // getAccount,
-  // createMintToCheckedInstruction,
+
   getAssociatedTokenAddress,
-  // mintToChecked,
+
   TOKEN_PROGRAM_ID,
-  // NATIVE_MINT_2022,
+
   createMintToInstruction,
 } from '@solana/spl-token';
-// import fs from 'fs';
+
+
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
@@ -32,12 +32,20 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { publicKey } from '@solana/spl-stake-pool/dist/codecs';
+ 
+// DEV Constants
+// const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
+// const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
+// const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
 
-// Constants
-const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
-const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
-const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
-const connection = new Connection('https://api.devnet.solana.com', 'processed');
+//PROD Constants
+// Constants for production environment
+const STAKE_ACCOUNT = new PublicKey('8KNDibG6RAc1tE2i3UKboiQ1tdf7JuwLWjCTnVNChcP9');
+const STAKE_POOL_ID = new PublicKey('2WwgnKfu9NuAiwshph864uD9wyGRCtmvhpsVGy4dHaDo');
+const POOL_TOKEN_MINT = new PublicKey('CdNQmTvm56YWoox9twQA4Ha3rY4mZYLnxgsKQg6YXPDT');
+
+
+const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 // const API_BASE_URL = 'http://localhost:8001'
 const DECIMALS = 9; // Number of decimals for RAID token
@@ -57,6 +65,7 @@ export default function AccountDetailFeature() {
   const [solPrice, setSolPrice] = useState<number>(0);
   const [totalSolInPool, setTotalSolInPool] = useState<number>(0);
   const [lastPriceFetchTime, setLastPriceFetchTime] = useState<number>(0); // Stores the last fetch timestamp
+  const [activeView, setActiveView] = useState<"SOL Stake Pool" | "SOL/RAID LP">("SOL Stake Pool");
 
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
@@ -188,8 +197,8 @@ const calculateTvl = async () => {
     console.log(response.data)
       setClaimableRewards(staking_rewards);
     } catch (error) {
-      console.error('Error fetching staked balance:', error);
-      toast.error('Failed to fetch staked balance.');
+      console.log('Trying to refresh staking rewards:', error);
+     // toast.error('Failed to fetch staked balance.');
     }
   };
 
@@ -302,6 +311,31 @@ const withdrawStake = async () => {
   }
 };
 
+async function getMintAuthorityKeypair() {
+  try {
+    // Explicitly define the base URL if needed
+    const response = await axios.get(`${API_BASE_URL}/staking-data/secret`); // Replace with the actual backend URL if necessary
+    console.log('Response:', response);
+
+    const { key } = response.data;
+
+    if (!key) {
+      throw new Error('Secret key is not defined in the backend response');
+    }
+
+    // Parse the key string into a Uint8Array
+    const secretArray = JSON.parse(key);
+    const secretBytes = Uint8Array.from(secretArray);
+
+    // Create the Keypair from the secret bytes
+    const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
+
+    return mintAuthorityKeypair;
+  } catch (error) {
+    console.error('Error fetching or processing the secret key:', error);
+    throw error;
+  }
+}
 const claimRewards = async (publicKey: PublicKey) => {
   if (!publicKey) {
     toast.error('Wallet not connected.');
@@ -324,19 +358,16 @@ const claimRewards = async (publicKey: PublicKey) => {
     console.log(`Claimable rewards: ${claimed_rewards}`);
 
     // Update to the new mint address and custom program ID
-    const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
+    const RAID_MINT_ADDRESS = new PublicKey('HNEgW597ZQwZAVL8iEaAc3aKv735pFTspVLqrJESpoth');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 
-    // Mint authority (hard-coded for testing)
-    const mintAuthorityKeypair = Keypair.fromSecretKey(
-      Uint8Array.from([
-        50, 174, 46, 66, 193, 4, 111, 223, 135, 48, 242, 200, 215, 31, 125, 101, 121,
-        75, 135, 207, 91, 180, 96, 79, 226, 62, 168, 111, 101, 210, 23, 157, 237, 216,
-        27, 84, 223, 122, 169, 247, 14, 105, 151, 248, 87, 96, 173, 40, 218, 74, 83,
-        177, 2, 32, 4, 122, 90, 171, 85, 7, 59, 211, 83, 42
-      ])
-    );
-
+  
+     
+      const mintAuthorityKeypair  = await getMintAuthorityKeypair();
+  
+      console.log('Mint Authority Keypair:', mintAuthorityKeypair.publicKey.toBase58());
+  
+  
     // Get the associated token account for the user
     const userTokenAccount = await getAssociatedTokenAddress(
       RAID_MINT_ADDRESS,
@@ -361,6 +392,7 @@ const claimRewards = async (publicKey: PublicKey) => {
           CUSTOM_TOKEN_PROGRAM_ID // Custom token program ID
         )
       );
+      
     }
 
     // Calculate the amount to mint in the smallest unit
@@ -397,10 +429,12 @@ const claimRewards = async (publicKey: PublicKey) => {
     toast.success(`Successfully claimed ${claimed_rewards} RAID.`);
     setClaimableRewards(0);
     await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/rewards-claimed`);
+
   } catch (error) {
     console.error('Error claiming rewards:', error);
     toast.error('Failed to claim rewards.');
   }
+  
 };
 
 
@@ -448,7 +482,7 @@ const claimRewards = async (publicKey: PublicKey) => {
   <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
   <p className="text-gray-300">
     <strong>Total SOL in Pool:</strong>{' '}
-    <span className="text-white">{formatNumberWithCommas(totalSolInPool)} SOL</span>
+    <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
   </p>
   <p className="text-gray-300">
     <strong>SOL Price:</strong>{' '}
@@ -502,113 +536,164 @@ const claimRewards = async (publicKey: PublicKey) => {
         </div>
     
         <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake and Unstake SOL</h2>
+  {/* <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Vaults</h2> */}
   
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {/* Stake SOL Section */}
-    <div className="bg-gray-900 p-4 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
-      <div className="mb-4">
-        <input
-          type="number"
-          value={amountToStake}
-          onChange={(e) => setAmountToStake(Number(e.target.value))}
-          placeholder="Amount to Stake"
-          className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
-        />
-      </div>
-      <div className="flex gap-2 justify-center mb-4">
-        <button
-          onClick={() => setAmountToStake(walletBalance * 0.25)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          25%
-        </button>
-        <button
-          onClick={() => setAmountToStake(walletBalance * 0.5)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          50%
-        </button>
-        <button
-          onClick={() => setAmountToStake(walletBalance - 0.001)}
-          className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-        >
-          MAX
-        </button>
-      </div>
-      <button
-        onClick={stakeSol}
-        className={`w-full py-3 px-4 font-medium rounded 
-          ${amountToStake > 0 && amountToStake <= walletBalance 
-            ? "bg-teal-500 hover:bg-teal-600 text-white" 
-            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-        disabled={amountToStake <= 0 || amountToStake > walletBalance}
-      >
-        Stake
-      </button>
-    </div>
 
-    {/* Withdraw SOL Section */}
-    <div className="bg-gray-900 p-4 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
-      <div className="mb-4">
-        <input
-          type="number"
-          value={amountToWithdraw}
-          onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
-          placeholder="Amount to Withdraw"
-          className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
-        />
+    {/* Header */}
+    <div className="max-w-3xl w-full text-center mb-8">
+        <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Vault</h1>
+        <p className="text-gray-300 text-lg">
+          Switch between staking SOL in the RAID Community Stake Pool or managing your RAID/SOL LP tokens.
+        </p>
       </div>
-      <div className="flex gap-2 justify-center mb-4">
+
+      {/* Toggle Switch */}
+      <div className="flex justify-center items-center mb-6">
         <button
-          onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          className={`px-4 py-2 font-semibold rounded-l ${
+            activeView === "SOL Stake Pool"
+              ? "bg-teal-500 text-white"
+              : "bg-gray-700 text-gray-300"
+          }`}
+          onClick={() => setActiveView("SOL Stake Pool")}
         >
-          25%
+          Sol Stake Pool
         </button>
         <button
-          onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          className={`px-4 py-2 font-semibold rounded-r ${
+            activeView === "SOL/RAID LP"
+              ? "bg-teal-500 text-white"
+              : "bg-gray-700 text-gray-300"
+          }`}
+          onClick={() => setActiveView("SOL/RAID LP")}
         >
-          50%
-        </button>
-        <button
-          onClick={() => setAmountToWithdraw(stakedAmount)}
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-        >
-          MAX
+          RAID/SOL LP
         </button>
       </div>
-      <button
-        onClick={withdrawStake}
-        className={`w-full py-3 px-4 font-medium rounded 
-          ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
-            ? "bg-red-500 hover:bg-red-600 text-white" 
-            : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-        disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
-      >
-        Withdraw
-      </button>
+
+     {/* Conditional Views */}
+{activeView === "SOL Stake Pool" && (
+  <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+
+    {/* Responsive Container for Stake and Withdraw Sections */}
+    <div className="flex flex-col lg:flex-row lg:gap-6">
+      {/* Stake SOL Section */}
+      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+        <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
+        <div className="mb-4">
+          <input
+            type="number"
+            value={amountToStake}
+            onChange={(e) => setAmountToStake(Number(e.target.value))}
+            placeholder="Amount to Stake"
+            className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
+          />
+        </div>
+        <div className="flex gap-2 justify-center mb-4">
+          <button
+            onClick={() => setAmountToStake(walletBalance * 0.25)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            25%
+          </button>
+          <button
+            onClick={() => setAmountToStake(walletBalance * 0.5)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            50%
+          </button>
+          <button
+            onClick={() => setAmountToStake(walletBalance - 0.001)}
+            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+          >
+            MAX
+          </button>
+        </div>
+        <button
+          onClick={stakeSol}
+          className={`w-full py-3 px-4 font-medium rounded 
+            ${amountToStake > 0 && amountToStake <= walletBalance 
+              ? "bg-teal-500 hover:bg-teal-600 text-white" 
+              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+          disabled={amountToStake <= 0 || amountToStake > walletBalance}
+        >
+          Stake
+        </button>
+      </div>
+
+      {/* Withdraw SOL Section */}
+      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+        <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
+        <div className="mb-4">
+          <input
+            type="number"
+            value={amountToWithdraw}
+            onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
+            placeholder="Amount to Withdraw"
+            className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
+          />
+        </div>
+        <div className="flex gap-2 justify-center mb-4">
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            25%
+          </button>
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            50%
+          </button>
+          <button
+            onClick={() => setAmountToWithdraw(stakedAmount)}
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+          >
+            MAX
+          </button>
+        </div>
+        <button
+          onClick={withdrawStake}
+          className={`w-full py-3 px-4 font-medium rounded 
+            ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
+              ? "bg-red-500 hover:bg-red-600 text-white" 
+              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+          disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
+        >
+          Withdraw
+        </button>
+      </div>
     </div>
   </div>
-</div>
+)}
 
+      {activeView === "SOL/RAID LP" && (
+        <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">RAID/SOL LP</h2>
+          <div className="mb-4">
+            <p className="text-gray-300">
+              <strong>Wallet Balance:</strong> <span className="text-white">- RAID/SOL LP Tokens</span>
+            </p>
+          </div>
+          <button
+            disabled
+            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed"
+          >
+            Deposit LP Tokens (Coming Soon)
+          </button>
+          <button
+            disabled
+            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed mt-4"
+          >
+            Withdraw LP Tokens (Coming Soon)
+          </button>
+        </div>
+      )}
+    </div>
 
-        {/* Transaction History */}
-        {/* <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Transaction History</h2>
-          {transactions.length > 0 ? (
-            <ul className="list-disc pl-5 text-gray-300">
-              {transactions.map((tx, index) => (
-                <li key={index} className="break-words">{tx}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-400 text-center">No transactions found.</p>
-          )}
-        </div> */}
+    </div>
       </div>
     );
     
