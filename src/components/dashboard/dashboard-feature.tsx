@@ -4,14 +4,15 @@ import { AppHero } from '../ui/ui-layout';
 import ParticleVisualization from './ParticleVisualization';
 
 const links = [
-    { label: 'Community', href: 'https://discord.gg/GqcXHf3H' },
-    { label: 'Whitepaper', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/whitepaper/' },
-    { label: 'Roadmap', href: 'https://main.d2dsx34860dw9c.amplifyapp.com/roadmap/' },
-    // { label: 'Client Documentation', href: 'https://faucet.solana.com/' },
+    { label: 'Community', href: 'https://discord.gg/GqcXHf3H', disable : false},
+    // { label: 'Whitepaper', href: '/whitepaper' },
+    // { label: 'Roadmap', href: '/roadmap' },
+    { label: 'Compute Client Portal', href: '/', disable :true },
     { label: 'GPU Provider Program', href: 'https://github.com/montyxrizzo/GPU_Provider_Program',rel:"noopener noreferrer",
-        className:"text-green-400 font-semibold" },
+        className:"text-green-400 font-semibold",  disable :true },
 
 ];
+
 
 export default function DashboardFeature() {
     return (
@@ -29,7 +30,7 @@ export default function DashboardFeature() {
                         title={
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white">
                                 R<span className="text-indigo-400">A</span>
-                                <span className="text-indigo-400">I</span>D
+                                <span className="text-indigo-400">I</span>D Network
                             </h1>
                         }
                         subtitle={
@@ -54,22 +55,22 @@ export default function DashboardFeature() {
                     contribution counts toward creating a more decentralized, accessible, and efficient AI
                     infrastructure.
                 </p>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
-                    {links.map((link, index) => (
-                            <a
-                            key={index}
-                            href={link.href}
-                            target="_blank"
-                            rel={link.rel || "noopener noreferrer"}
-                            className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
-                                link.className || "text-white font-semibold"
-                            }`}
-                        >
-                            <p>{link.label}</p>
-                        </a>
-                    ))}
-                </div>
+  {links.map((link, index) => (
+    <a
+      key={index}
+      href={link.disable ? "#" : link.href}  // If disabled, set href to '#' (non-functional link)
+      target={link.disable ? "" : "_blank"}  // If disabled, don't open in new tab
+      rel={link.disable ? "" : link.rel || "noopener noreferrer"}  // If disabled, no rel
+      className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+        link.className || "text-white font-semibold"
+      } ${link.disable ? "pointer-events-none opacity-50" : ""}`}  // Disable link interaction and add opacity
+    >
+      <p>{link.label}</p>
+    </a>
+  ))}
+</div>
+
             </div>
 
             {/* Footer with Social Links */}

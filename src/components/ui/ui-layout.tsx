@@ -17,7 +17,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
         <div className="container mx-auto flex items-center justify-between px-4">
     {/* Logo */}
         <Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
-          <div className="relative">
+          {/* <div className="relative"> */}
             {/* Logo Wrapper */}
             <div className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center">
           <img
@@ -26,7 +26,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
             src="/raid_token_close.png"
           />
         </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
+          {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
         </div>
         <div
           className="hidden md:inline-block text-base font-semibold bg-clip-text text-transparent 
@@ -35,7 +35,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
           Remote <span className="text-white">AI</span> Infrastructure
           <br />
           Deployment
-        </div>
+        </div> */}
       </Link>
 
 
@@ -70,15 +70,15 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
               </li>
             ))}
             <li>
-              <a
-                href="https://v2.raydium.io/swap/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-400 font-semibold"
-              >
-                #GET RAID
-                
-              </a>
+            <a
+  href="https://v2.raydium.io/swap/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-green-400 font-semibold p-2 rounded-lg transition-colors duration-300 hover:bg-green-100 hover:text-green-500"
+>
+  # GET RAID
+</a>
+
             </li>
             &nbsp;
 
