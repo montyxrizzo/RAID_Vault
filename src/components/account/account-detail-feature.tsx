@@ -185,14 +185,19 @@ const calculateTvl = async () => {
       // Sync fetched data to the server
       if (balance === 0) {
         console.log("No staked balance, skipping API call.");
-        // setClaimableRewards(0);
         return;
       }
   
     // Fetch claimable rewards from the server
     const response = await axios.get(
-      `${API_BASE_URL}/staking-data/${publicKey.toBase58()}`
+      `${API_BASE_URL}/staking-data/${publicKey.toBase58()}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
     );
+    console.log(response)
     const {  staking_rewards } = response.data;
     console.log(response.data)
       setClaimableRewards(staking_rewards);
