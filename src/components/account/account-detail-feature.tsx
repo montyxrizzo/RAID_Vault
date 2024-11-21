@@ -33,11 +33,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { publicKey } from '@solana/spl-stake-pool/dist/codecs';
  
-// Constants
-const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
-const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
-const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
-const connection = new Connection('https://api.devnet.solana.com', 'processed');
+// DEV Constants
+// const STAKE_ACCOUNT = new PublicKey('C2XB48wMvjPqNEju8yu9tQ6YyUmfWQrFKtYPsE9uoHTQ')
+// const STAKE_POOL_ID = new PublicKey('E17hzYQczWxUeVMQqsniqoZH4ZYj5koXUmAxYe4KDEdL'); // Stake pool ID
+// const POOL_TOKEN_MINT = new PublicKey('Lx48m36jmsyudPHs6SNUD3dsJ81J6ivsEVeCUsWQsBp'); // Pool token mint
+
+//PROD Constants
+// Constants for production environment
+const STAKE_ACCOUNT = new PublicKey('8KNDibG6RAc1tE2i3UKboiQ1tdf7JuwLWjCTnVNChcP9');
+const STAKE_POOL_ID = new PublicKey('2WwgnKfu9NuAiwshph864uD9wyGRCtmvhpsVGy4dHaDo');
+const POOL_TOKEN_MINT = new PublicKey('CdNQmTvm56YWoox9twQA4Ha3rY4mZYLnxgsKQg6YXPDT');
+
+
+const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 // const API_BASE_URL = 'http://localhost:8001'
 const DECIMALS = 9; // Number of decimals for RAID token
@@ -189,8 +197,8 @@ const calculateTvl = async () => {
     console.log(response.data)
       setClaimableRewards(staking_rewards);
     } catch (error) {
-      console.error('Error fetching staked balance:', error);
-      toast.error('Failed to fetch staked balance.');
+      console.log('Trying to refresh staking rewards:', error);
+     // toast.error('Failed to fetch staked balance.');
     }
   };
 
@@ -350,7 +358,7 @@ const claimRewards = async (publicKey: PublicKey) => {
     console.log(`Claimable rewards: ${claimed_rewards}`);
 
     // Update to the new mint address and custom program ID
-    const RAID_MINT_ADDRESS = new PublicKey('mnt2sTipfENeVjbVY7Tt8XPwps1EsELZQYeZivSF14v');
+    const RAID_MINT_ADDRESS = new PublicKey('HNEgW597ZQwZAVL8iEaAc3aKv735pFTspVLqrJESpoth');
     const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
 
   
@@ -474,7 +482,7 @@ const claimRewards = async (publicKey: PublicKey) => {
   <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
   <p className="text-gray-300">
     <strong>Total SOL in Pool:</strong>{' '}
-    <span className="text-white">{formatNumberWithCommas(totalSolInPool)} SOL</span>
+    <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
   </p>
   <p className="text-gray-300">
     <strong>SOL Price:</strong>{' '}

@@ -19,7 +19,7 @@ setup_test_validator() {
   solana-test-validator \
     --clone-upgradeable-program SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy \
     --clone-upgradeable-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s \
-    --url mainnet-beta \
+    --url -beta \
     --slots-per-epoch 32 \
     --quiet --reset &
   # Uncomment to use a locally built stake program
