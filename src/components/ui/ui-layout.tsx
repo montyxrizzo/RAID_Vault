@@ -15,18 +15,19 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
       {/* Navbar */}
       <nav className="navbar bg-base-300 text-neutral-content fixed top-0 left-0 right-0 z-50 shadow-md">
         <div className="container mx-auto flex items-center justify-between px-4">
-      {/* Logo */}
-      <Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
-        <div className="relative">
-          {/* Animated Logo */}
-          <div className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-indigo-500/70 flex items-center justify-center overflow-hidden">
-      <img
-        className="h-full w-full rounded-full object-contain"
-        alt="Logo"
-        src="/optimized_logo.png"
-      />
-    </div>
+    {/* Logo */}
+<Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
+  <div className="relative">
+    {/* Logo Wrapper */}
+    <div className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center">
+  <img
+    className="h-full w-full rounded-full object-cover"
+    alt="Logo"
+    src="/logo.png"
+  />
+</div>
 
+ 
 
 
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
