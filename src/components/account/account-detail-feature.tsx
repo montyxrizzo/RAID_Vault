@@ -512,7 +512,7 @@ const claimRewards = async (publicKey: PublicKey) => {
   </p>
   <p className="text-gray-300">
     <strong>Total Value Locked (TVL):</strong>{' '}
-    <span className="text-teal-300">${formatNumberWithCommas(tvl)} USD</span>
+    <span className="text-teal-300">${formatNumberWithCommas(Number(formatNumberDecimals(tvl)))} USD</span>
   </p>
 </div>
 
