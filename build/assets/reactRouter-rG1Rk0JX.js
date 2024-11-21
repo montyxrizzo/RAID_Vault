@@ -1,4 +1,4 @@
-import{r as c,R as ue}from"./jotai-BQKov7P-.js";import"./react-BxUbYN1e.js";/**
+import{r as c,R as ue}from"./jotai-DjeRa5Ps.js";import"./react-CxEt3Z_u.js";/**
  * @remix-run/router v1.21.0
  *
  * Copyright (c) Remix Software Inc.
