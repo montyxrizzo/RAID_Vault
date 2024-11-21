@@ -23,7 +23,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
           <img
             className="h-full w-full rounded-full object-cover"
             alt="Logo"
-            src="/logo.png"
+            src="/public/raid_token_close.png"
           />
         </div>
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
