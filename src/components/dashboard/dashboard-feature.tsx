@@ -103,9 +103,9 @@ export default function DashboardFeature() {
                         <span className="font-medium">Follow us on X</span>
                     </a>
                 </div> */}
-                <p className="text-sm text-gray-300 mt-4 text-center">
-                    © 2024 RAID Network. All rights reserved.
-                </p>
+                {/* <p className="text-sm text-gray-300 mt-4 text-center">
+               
+                </p> */}
             </footer>
         </div>
     );

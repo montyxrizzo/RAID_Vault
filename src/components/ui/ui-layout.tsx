@@ -158,7 +158,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
       ></a>
     </p> */}
     <p className="mt-2">
-      © Raid Network 2024
+    © 2024 RAID Network. All rights reserved.
     </p>
     <div className="flex space-x-4 mt-2 text-sm text-gray-500">
       <a
