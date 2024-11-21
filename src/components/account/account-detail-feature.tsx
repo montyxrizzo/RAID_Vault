@@ -478,7 +478,7 @@ const claimRewards = async (publicKey: PublicKey) => {
           <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Community Staking Pool</h1>
           <p className="text-gray-300 text-lg">
             Join the RAID community-run staking pool on Solana. Stake your SOL to help secure the network, 
-            earn rewards, and receive <span className="text-teal-400 font-semibold">RADIATION</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens. 
+            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens. 
             These tokens can be used across Solana’s DeFi ecosystem to maximize your potential.
           </p>
         </div>
@@ -508,7 +508,7 @@ const claimRewards = async (publicKey: PublicKey) => {
               <strong>Wallet Balance:</strong> <span className="text-white">{walletBalance} SOL</span>
             </p>
             <p className="text-gray-300">
-              <strong>Staked Amount:</strong> <span className="text-white">{stakedAmount} Pool Tokens (Radiation)</span>
+              <strong>Staked Amount:</strong> <span className="text-white">{stakedAmount} Pool Tokens (Radeon)</span>
             </p>
             <p className="text-gray-300">
               <strong>Claimable Rewards:</strong> 

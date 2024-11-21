@@ -19,11 +19,16 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
       <Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
         <div className="relative">
           {/* Animated Logo */}
-          <img
-            className="h-10 w-10 rounded-full shadow-lg ring-2 ring-indigo-500/70 animate-pulse"
-            alt="Logo"
-            src="/logo.png"
-          />
+          <div className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-indigo-500/70 flex items-center justify-center overflow-hidden">
+      <img
+        className="h-full w-full rounded-full object-contain"
+        alt="Logo"
+        src="/optimized_logo.png"
+      />
+    </div>
+
+
+
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
         </div>
         <div
@@ -75,10 +80,14 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
                 className="text-green-400 font-semibold"
               >
                 #GET RAID
+                
               </a>
             </li>
-          </ul>
+            &nbsp;
 
+          </ul>
+          
+ 
           {/* Wallet and Cluster Select */}
           <div className="hidden md:flex items-center space-x-2">
             <WalletButton />
