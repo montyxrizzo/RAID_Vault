@@ -8,7 +8,8 @@ const ClusterFeature = lazy(() => import('../components/cluster/cluster-feature'
 const DashboardFeature = lazy(() => import('../components/dashboard/dashboard-feature'))
 const WhitepaperPage = lazy(() => import('../components/docs/whitepaper')); // Add this line
 const RoadmapFeature = lazy(() => import('../components/dashboard/roadmap'));
-
+const TermsPage = lazy(() => import('../components/docs/terms')); // Add this line
+const PrivacyPage = lazy(() => import('../components/docs/privacy')); // Add this line
 const links: { label: string; path: string }[] = [
   { label: 'Staking', path: '/account' },
 
@@ -25,6 +26,8 @@ const routes: RouteObject[] = [
   { path: '', element: <ClusterFeature /> },
   { path: '/roadmap', element: <RoadmapFeature /> }, // Add roadmap route
   { path: '/whitepaper', element: <WhitepaperPage /> }, // Add route for Whitepaper
+  { path: '/privacy', element: <PrivacyPage /> }, // Add route for Whitepaper
+  { path: '/terms', element: <TermsPage /> }, // Add route for Whitepaper
 
 ]
 

@@ -146,20 +146,49 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
         <Toaster position="bottom-right" />
       </div>
 
-      {/* Footer */}
       <footer className="footer footer-center p-4 bg-base-300 text-base-content">
-        <aside>
-          <p>
-            Developed with ❤️ in Philadelphia{" "}
-            <a
-              className="link hover:text-white"
-              href=""
-              target="_blank"
-              rel="noopener noreferrer"
-            ></a>
-          </p>
-        </aside>
-      </footer>
+  <aside>
+    {/* <p>
+      Developed with ❤️ in Philadelphia{" "}
+      <a
+        className="link hover:text-white"
+        href=""
+        target="_blank"
+        rel="noopener noreferrer"
+      ></a>
+    </p> */}
+    <p className="mt-2">
+      © Raid Network 2024
+    </p>
+    <div className="flex space-x-4 mt-2 text-sm text-gray-500">
+      <a
+        href="/terms"
+        className="hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Terms
+      </a>
+      <a
+        href="/privacy"
+        className="hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Privacy
+      </a>
+      <a
+        href="/security"
+        className="hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Security
+      </a>
+    </div>
+  </aside>
+</footer>
+
     </div>
   );
 }
