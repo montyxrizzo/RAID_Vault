@@ -14,7 +14,7 @@ const links: { label: string; path: string }[] = [
 
   { label: 'Roadmap', path: '/roadmap' }, // Add roadmap link
   { label: 'Whitepaper', path: '/whitepaper' }, // Add link to Whitepaper
-  { label: 'Clusters', path: '/clusters' },
+  //{ label: 'Clusters', path: '' },
 
 
 ]
@@ -22,7 +22,7 @@ const links: { label: string; path: string }[] = [
 const routes: RouteObject[] = [
   { path: '/account/', element: <AccountListFeature /> },
   { path: '/account/:address', element: <AccountDetailFeature /> },
-  { path: '/clusters', element: <ClusterFeature /> },
+  { path: '', element: <ClusterFeature /> },
   { path: '/roadmap', element: <RoadmapFeature /> }, // Add roadmap route
   { path: '/whitepaper', element: <WhitepaperPage /> }, // Add route for Whitepaper
 
