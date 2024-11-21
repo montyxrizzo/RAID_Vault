@@ -108,42 +108,42 @@ export default function RoadmapFeature() {
         </h2>
 
         <div
-          className={`relative flex ${
-            isMobile ? "flex-col gap-y-12" : "flex-row gap-x-12"
-          } items-center overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900`}
-        >
-          {/* Progress Line */}
-          <div
-            className={`absolute ${
-              isMobile
-                ? "h-full left-1/2 -translate-x-1/2 w-1"
-                : "w-full h-1 top-1/2 -translate-y-1/2"
-            } bg-gray-600`}
-          ></div>
+  className={`relative flex ${
+    isMobile ? "flex-col gap-y-12" : "flex-row gap-x-12"
+  } items-center overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900`}
+>
+  {/* Progress Line (Gray) */}
+  <div
+    className={`absolute ${
+      isMobile
+        ? "h-full left-1/2 -translate-x-1/2 w-1"
+        : "w-full h-1 top-1/2 -translate-y-1/2"
+    } bg-gray-600`}
+  ></div>
 
-          <div
-            className={`absolute ${
-              isMobile
-                ? "h-full left-1/2 -translate-x-1/2 w-1"
-                : "w-full h-1 top-1/2 -translate-y-1/2"
-            } bg-green-500`}
-            style={{
-              height: isMobile
-                ? `${(latestAchievedIndex / (milestones.length - 1)) * 100}%`
-                : "1px",
-              width: isMobile
-                ? "1px"
-                : `${((latestAchievedIndex + 1) / milestones.length) * 100}%`,
-            }}
-          ></div>
-
+  {/* Progress Line (Green) */}
+  <div
+    className={`absolute ${
+      isMobile
+        ? "h-full left-1/2 -translate-x-1/2 w-1"
+        : "w-full h-1 top-1/2 -translate-y-1/2"
+    } bg-green-500`}
+    style={{
+      height: isMobile
+        ? `${((latestAchievedIndex + 1) / milestones.length) * 100}%`
+        : "1px",
+      width: isMobile
+        ? "1px"
+        : `${((latestAchievedIndex + 1) / milestones.length) * 100}%`,
+    }}
+  ></div>
 
   {milestones.map((milestone, index) => (
-      <div
+    <div
       key={index}
-      className={`relative flex flex-col items-center w-full md:w-1/4 ${
-        index === 0 ? "ml-0" : ""
-      }`}
+      className={`relative flex flex-col items-center ${
+        isMobile ? "w-full" : "w-1/4"
+      } ${index === 0 ? (isMobile ? "mt-0" : "ml-0") : ""}`}
     >
       {/* Circle Indicator */}
       <div
@@ -159,17 +159,20 @@ export default function RoadmapFeature() {
           milestone.achieved ? "bg-indigo-800" : "bg-gray-800"
         }`}
       >
-        <h3 className="text-lg md:text-xl font-semibold mb-1">{milestone.quarter}</h3>
+        <h3 className="text-lg md:text-xl font-semibold mb-1">
+          {milestone.quarter}
+        </h3>
         <h4 className="text-base md:text-lg font-medium text-indigo-300 mb-3">
           {milestone.title}
         </h4>
         <p className="text-xs md:text-sm text-gray-300 text-center">
           {milestone.description}
-          </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        </p>
+      </div>
+    </div>
+  ))}
+</div>
+
       </div>
     </div>
   );
