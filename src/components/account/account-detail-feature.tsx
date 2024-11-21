@@ -716,6 +716,21 @@ const claimRewards = async (publicKey: PublicKey) => {
         </div>
       )}
     </div>
+    {errorMessage && (
+  <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
+    <p>{errorMessage}</p>
+    {errorMessage.includes('Check transaction:') && (
+      <a
+        href={`https://explorer.solana.com/tx/${errorMessage.split('Check transaction: ')[1]}?cluster=mainnet-beta`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 underline"
+      >
+        View on Solana Explorer
+      </a>
+    )}
+  </div>
+)}
 
     </div>
       </div>
