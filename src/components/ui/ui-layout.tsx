@@ -3,194 +3,172 @@ import toast, { Toaster } from 'react-hot-toast'
 import { Link, useLocation } from 'react-router-dom'
 
 import { AccountChecker } from '../account/account-ui'
-import { ClusterChecker, ClusterUiSelect, ExplorerLink } from '../cluster/cluster-ui'
+import { ClusterChecker, ExplorerLink } from '../cluster/cluster-ui'  //ClusterUiSelect commented out for prod
 import { WalletButton } from '../solana/solana-provider'
 
 export function UiLayout({ children, links }: { children: ReactNode; links: { label: string; path: string }[] }) {
   const pathname = useLocation().pathname;
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to toggle menu visibility
+  const [isCollapsed, setIsCollapsed] = useState(false); // State to manage collapse on resize
 
-  return (
-    <div className="h-full flex flex-col">
-      {/* Navbar */}
-      <nav className="navbar bg-base-300 text-neutral-content fixed top-0 left-0 right-0 z-50 shadow-md">
-        <div className="container mx-auto flex items-center justify-between px-4">
-    {/* Logo */}
+ // Handle window resize and collapse logic
+ useEffect(() => {
+  const handleResize = () => {
+    setIsCollapsed(window.innerWidth < 768); // Collapse for smaller screens
+  };
+
+  handleResize(); // Run on mount
+  window.addEventListener("resize", handleResize); // Listen for resize events
+  return () => window.removeEventListener("resize", handleResize); // Cleanup listener
+}, []);
+
+return (
+  <div className="h-full flex flex-col">
+    {/* Navbar */}
+    <nav className="navbar bg-base-300 text-neutral-content fixed top-0 left-0 right-0 z-50 shadow-md">
+      <div className="container mx-auto flex items-center justify-between px-4">
+        {/* Logo */}
         <Link className="btn btn-ghost normal-case text-xl rounded-full flex items-center space-x-2" to="/">
-          {/* <div className="relative"> */}
-            {/* Logo Wrapper */}
-            <div className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center">
-          <img
-            className="h-full w-full rounded-full object-cover"
-            alt="Logo"
-            src="/raid_token_close.png"
-          />
-        </div>
-          {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-green-400 opacity-20 rounded-full"></div>
-        </div>
-        <div
-          className="hidden md:inline-block text-base font-semibold bg-clip-text text-transparent 
-          bg-gradient-to-r from-green-400 via-purple-500 to-indigo-400 tracking-tight leading-snug"
+          <div className="h-10 w-10 rounded-full bg-gray-800 flex items-center justify-center">
+            <img className="h-full w-full rounded-full object-cover" alt="Logo" src="/raid_token_close.png" />
+          </div>
+        </Link>
+
+        {/* Hamburger Menu Button (visible on mobile only) */}
+        {/* <button
+          className="btn btn-ghost md:hidden"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
         >
-          Remote <span className="text-white">AI</span> Infrastructure
-          <br />
-          Deployment
-        </div> */}
-      </Link>
-
-
-          {/* Hamburger Menu Button (visible on mobile only) */}
-          <button
-            className="btn btn-ghost md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
-          </button>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button> */}
 
-          {/* Desktop Menu */}
-          <ul className="hidden md:flex space-x-4 items-center">
+        {/* Desktop Menu */}
+        <ul className="hidden md:flex space-x-4 items-center">
+          {links.map(({ label, path }) => (
+            <li key={path}>
+              <Link
+                className={`hover:text-indigo-400 ${
+                  pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""
+                }`}
+                to={path}
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <a
+              href="https://v2.raydium.io/swap/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-400 font-semibold p-2 rounded-lg transition-colors duration-300 hover:bg-green-100 hover:text-green-500"
+            >
+              #GET RAID
+            </a>
+          </li>
+        </ul>
+
+        {/* Wallet and Cluster Select */}
+        {!isCollapsed ? (
+          <div className="hidden md:flex items-center space-x-2">
+            <WalletButton />
+            {/* <ClusterUiSelect /> */}
+          </div>
+        ) : (
+          <button
+          className="btn btn-ghost md:hidden"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+        )}
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && isCollapsed && (
+        <div className="md:hidden bg-base-300 px-4 pt-2 pb-4 shadow-md z-40">
+          <ul className="space-y-2">
             {links.map(({ label, path }) => (
               <li key={path}>
                 <Link
-                  className={`hover:text-indigo-400 ${pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""}`}
+                  className={`block py-2 hover:text-indigo-400 ${
+                    pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""
+                  }`}
                   to={path}
+                  onClick={() => setIsMenuOpen(false)} // Close menu on link click
                 >
                   {label}
                 </Link>
               </li>
             ))}
             <li>
-            <a
-  href="https://v2.raydium.io/swap/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="text-green-400 font-semibold p-2 rounded-lg transition-colors duration-300 hover:bg-green-100 hover:text-green-500"
->
-  # GET RAID
-</a>
-
-            </li>
-            &nbsp;
-
-          </ul>
-          
- 
-          {/* Wallet and Cluster Select */}
-          <div className="hidden md:flex items-center space-x-2">
-            <WalletButton />
-            <ClusterUiSelect />
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-            <div className="md:hidden bg-base-300 px-4 pt-2 pb-4 shadow-md z-40">
-             <ul className="space-y-2">
-              {links.map(({ label, path }) => (
-                <li key={path}>
-                  <Link
-                    className={`block py-2 hover:text-indigo-400 ${
-                      pathname.startsWith(path) ? "text-indigo-400 font-bold" : ""
-                    }`}
-                    to={path}
-                    onClick={() => setIsMenuOpen(false)} // Close menu on link click 
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <a
-                  href="https://v2.raydium.io/swap/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block py-2 text-green-400 font-semibold"
-                  onClick={() => setIsMenuOpen(false)} // Close menu on external link click
-                >
-                  #GET RAID
-                </a>
-              </li>
-            </ul>
-            <div className="mt-4 flex justify-end space-x-2">
               <WalletButton />
-              <ClusterUiSelect />
-            </div>
+            </li>
+            <li>
+              {/* <ClusterUiSelect /> */}
+            </li>
+          </ul>
+        </div>
+      )}
+    </nav>
+
+    {/* Page Content */}
+    <div className="mt-[72px] flex-grow mx-4 lg:mx-auto">
+      {/* Avoid overlap with navbar */}
+      <ClusterChecker>
+        <AccountChecker />
+      </ClusterChecker>
+      <Suspense
+        fallback={
+          <div className="text-center my-32">
+            <span className="loading loading-spinner loading-lg"></span>
           </div>
-        )}
-      </nav>
-
-      {/* Page Content */}
-      <div className="mt-[72px] flex-grow mx-4 lg:mx-auto"> {/* Add margin-top to avoid overlap with fixed navbar */}
-        <ClusterChecker>
-          <AccountChecker />
-        </ClusterChecker>
-        <Suspense
-          fallback={
-            <div className="text-center my-32">
-              <span className="loading loading-spinner loading-lg"></span>
-            </div>
-          }
-        >
-          {children}
-        </Suspense>
-        <Toaster position="bottom-right" />
-      </div>
-
-      <footer className="footer footer-center p-4 bg-base-300 text-base-content">
-  <aside>
-    {/* <p>
-      Developed with ❤️ in Philadelphia{" "}
-      <a
-        className="link hover:text-white"
-        href=""
-        target="_blank"
-        rel="noopener noreferrer"
-      ></a>
-    </p> */}
-    <p className="mt-2">
-    © 2024 RAID Network. All rights reserved.
-    </p>
-    <div className="flex space-x-4 mt-2 text-sm text-gray-500">
-      <a
-        href="/terms"
-        className="hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
+        }
       >
-        Terms
-      </a>
-      <a
-        href="/privacy"
-        className="hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Privacy
-      </a>
-      <a
-        href="/security"
-        className="hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Security
-      </a>
+        {children}
+      </Suspense>
+      <Toaster position="bottom-right" />
     </div>
-  </aside>
-</footer>
 
-    </div>
-  );
+    {/* Footer */}
+    <footer className="footer footer-center p-4 bg-base-300 text-base-content">
+      <aside>
+        <p className="mt-2">© 2024 RAID Network. All rights reserved.</p>
+        <div className="flex space-x-4 mt-2 text-sm text-gray-500">
+          <a href="/terms" className="hover:underline" target="_blank" rel="noopener noreferrer">
+            Terms
+          </a>
+          <a href="/privacy" className="hover:underline" target="_blank" rel="noopener noreferrer">
+            Privacy
+          </a>
+          <a href="/security" className="hover:underline" target="_blank" rel="noopener noreferrer">
+            Security
+          </a>
+        </div>
+      </aside>
+    </footer>
+  </div>
+);
 }
 
 

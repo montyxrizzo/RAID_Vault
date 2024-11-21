@@ -66,7 +66,9 @@ export default function AccountDetailFeature() {
   const [totalSolInPool, setTotalSolInPool] = useState<number>(0);
   const [lastPriceFetchTime, setLastPriceFetchTime] = useState<number>(0); // Stores the last fetch timestamp
   const [activeView, setActiveView] = useState<"SOL Stake Pool" | "SOL/RAID LP">("SOL Stake Pool");
-
+  const [loading, setLoading] = useState<boolean>(false); // To indicate loading
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
+  
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
   const formatNumberWithCommas = (num: number): string => {
@@ -223,70 +225,77 @@ const calculateTvl = async () => {
       toast.error('Wallet not connected.');
       return;
     }
-
+  
     if (amountToStake <= 0 || amountToStake > walletBalance) {
       toast.error('Invalid staking amount.');
       return;
     }
-
+  
+    setLoading(true); // Start loading
+    setErrorMessage(null); // Clear previous error messages
+  
     try {
       const lamports = Math.floor(amountToStake * 1e9);
-
+  
       const { instructions, signers } = await depositSol(
         connection,
         STAKE_POOL_ID,
         publicKey,
         lamports
       );
-
+  
       const transaction = new Transaction().add(...instructions);
-
+  
       const signature = await sendTransaction(transaction, connection, { signers });
+      toast.info('Transaction sent. Waiting for confirmation...');
       await connection.confirmTransaction(signature, 'processed');
       toast.success(`Successfully staked ${amountToStake} SOL.`);
-      // setTransactions((prev) => [`Staked: ${amountToStake} SOL (Tx: ${signature})`, ...prev]);
-      
+  
       try {
         await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/deposit`, {
           amount: amountToStake,
         });
-        toast.success("Staking data synchronized successfully.");
+        toast.success('Staking data synchronized successfully.');
       } catch (syncError) {
-        console.error("Error syncing staking data:", syncError);
-        toast.error("Failed to synchronize staking data with the server.");
+        console.error('Error syncing staking data:', syncError);
+        toast.error('Failed to synchronize staking data with the server.');
       }
-      
+  
       fetchWalletBalance();
       fetchStakedBalance();
       setAmountToStake(0);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error staking SOL:', error);
-      toast.error('Failed to stake SOL.');
+      const transactionSignature = error.message.match(/Check signature (\w+)/)?.[1];
+      const transactionMessage = transactionSignature
+        ? `Check transaction: ${transactionSignature}`
+        : 'An error occurred. Please try again.';
+  
+      setErrorMessage(transactionMessage);
+      toast.error(`Failed to stake SOL. ${transactionMessage}`);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
+  
 
-
-
-// Withdraw SOL and trigger RAID rewards transfer
 // Withdraw SOL and trigger RAID rewards transfer
 const withdrawStake = async () => {
   if (!connected || !publicKey) {
-    toast.error("Wallet not connected.");
+    toast.error('Wallet not connected.');
     return;
   }
 
   if (amountToWithdraw <= 0 || amountToWithdraw > stakedAmount) {
-    toast.error("Invalid withdrawal amount.");
+    toast.error('Invalid withdrawal amount.');
     return;
   }
 
+  setLoading(true); // Start loading
+  setErrorMessage(null); // Clear previous error messages
+
   try {
-      
-    // Convert SOL to lamports and ensure integer values
-    console.log(`Trying to withdraw ${amountToWithdraw} lamports`)
-    // const lamports = amountToWithdraw ;
-    const lamports = parseFloat(amountToWithdraw.toFixed(9)); // Correctly convert SOL to lamports
-    console.log(`Withdrawing ${lamports} lamports (${amountToWithdraw} SOL)`);
+    const lamports = parseFloat(amountToWithdraw.toFixed(9)); // Convert SOL to lamports
 
     const { instructions, signers } = await withdrawSol(
       connection,
@@ -298,23 +307,31 @@ const withdrawStake = async () => {
 
     const transaction = new Transaction().add(...instructions);
     const signature = await sendTransaction(transaction, connection, { signers });
-    await connection.confirmTransaction(signature, "processed");
+    toast.info('Transaction sent. Waiting for confirmation...');
+    await connection.confirmTransaction(signature, 'processed');
     toast.success(`Successfully withdrew ${amountToWithdraw} SOL.`);
-    // setTransactions((prev) => [`Withdrew: ${amountToWithdraw} SOL (Tx: ${signature})`, ...prev]);
 
-      // Sync withdrawal data to the server
-      await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/withdraw`, {
-        amount: amountToWithdraw, // Ensure this matches backend expectations
-      });
-      // toast.success(`Claimed ${earnedRewards.toFixed(2)} RAID rewards.`);
+    await axios.post(`${API_BASE_URL}/staking-data/${publicKey.toBase58()}/withdraw`, {
+      amount: amountToWithdraw,
+    });
+
     fetchWalletBalance();
     fetchStakedBalance();
     setAmountToWithdraw(0);
-  } catch (error) {
-    console.error("Error withdrawing SOL:", error);
-    toast.error("Failed to withdraw SOL.");
+  } catch (error: any) {
+    console.error('Error withdrawing SOL:', error);
+    const transactionSignature = error.message.match(/Check signature (\w+)/)?.[1];
+    const transactionMessage = transactionSignature
+      ? `Check transaction: ${transactionSignature}`
+      : 'An error occurred. Please try again.';
+
+    setErrorMessage(transactionMessage);
+    toast.error(`Failed to withdraw SOL. ${transactionMessage}`);
+  } finally {
+    setLoading(false); // Stop loading
   }
 };
+
 
 async function getMintAuthorityKeypair() {
   try {
@@ -616,15 +633,16 @@ const claimRewards = async (publicKey: PublicKey) => {
           </button>
         </div>
         <button
-          onClick={stakeSol}
-          className={`w-full py-3 px-4 font-medium rounded 
-            ${amountToStake > 0 && amountToStake <= walletBalance 
-              ? "bg-teal-500 hover:bg-teal-600 text-white" 
-              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-          disabled={amountToStake <= 0 || amountToStake > walletBalance}
-        >
-          Stake
-        </button>
+  onClick={stakeSol}
+  className={`w-full py-3 px-4 font-medium rounded ${
+    loading || amountToStake <= 0 || amountToStake > walletBalance
+      ? 'bg-gray-500 text-gray-400 cursor-not-allowed'
+      : 'bg-teal-500 hover:bg-teal-600 text-white'
+  }`}
+  disabled={loading || amountToStake <= 0 || amountToStake > walletBalance}
+>
+  {loading ? 'Processing...' : 'Stake'}
+</button>
       </div>
 
       {/* Withdraw SOL Section */}
@@ -660,15 +678,16 @@ const claimRewards = async (publicKey: PublicKey) => {
           </button>
         </div>
         <button
-          onClick={withdrawStake}
-          className={`w-full py-3 px-4 font-medium rounded 
-            ${amountToWithdraw > 0 && amountToWithdraw <= stakedAmount 
-              ? "bg-red-500 hover:bg-red-600 text-white" 
-              : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
-          disabled={amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
-        >
-          Withdraw
-        </button>
+  onClick={withdrawStake}
+  className={`w-full py-3 px-4 font-medium rounded ${
+    loading || amountToWithdraw <= 0 || amountToWithdraw > stakedAmount
+      ? 'bg-gray-500 text-gray-400 cursor-not-allowed'
+      : 'bg-red-500 hover:bg-red-600 text-white'
+  }`}
+  disabled={loading || amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
+>
+  {loading ? 'Processing...' : 'Withdraw'}
+</button>
       </div>
     </div>
   </div>
