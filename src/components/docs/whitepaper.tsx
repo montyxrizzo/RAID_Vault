@@ -1,5 +1,5 @@
 // WhitepaperPage.tsx
-import React from "react";
+
 
 export default function WhitepaperPage() {
   return (
