@@ -494,7 +494,7 @@ const claimRewards = async (publicKey: PublicKey) => {
   }, [connected]);
   return (
 
-      <div className="bg-gray-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
+    <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
         <ToastContainer />
         {/* Header Section */}
         <div className="max-w-3xl w-full text-center mb-8">
@@ -508,7 +508,7 @@ const claimRewards = async (publicKey: PublicKey) => {
         </div>
 {/* TVL Dashboard */}
 <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
-  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Stake Rewards Pool TVL</h2>
+  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Staking Program TVL</h2>
   <p className="text-gray-300">
     <strong>Total SOL in Pool:</strong>{' '}
     <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
@@ -571,7 +571,7 @@ const claimRewards = async (publicKey: PublicKey) => {
 
     {/* Header */}
     <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Vault</h1>
+        <h1 className="text-4xl font-bold text-teal-400 mb-4">The Vault 🔒</h1>
         <p className="text-gray-300 text-lg">
           Switch between staking SOL in the RAID Community Stake Pool or managing your RAID/SOL LP tokens.
         </p>
