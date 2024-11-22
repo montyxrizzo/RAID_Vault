@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import axios from 'axios';
+
 import {
   Connection,
   PublicKey,
@@ -27,7 +30,10 @@ export default function AccountListFeature() {
     number: 0,
     config: { tension: 120, friction: 14 },
   }));
-
+  const [apy, setApy] = useState<number>(0);
+  const formatNumberWithCommas = (num: number): string => {
+    return new Intl.NumberFormat('en-US').format(Math.round(num));
+  };
   // Formatting utilities
   const formatNumberDecimals = (num: number): string =>
     new Intl.NumberFormat('en-US', {
@@ -40,7 +46,16 @@ export default function AccountListFeature() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(num);
-
+  // Fetch APY from the backend
+  const fetchApy = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/staking-data/reward-rate`);
+      setApy(response.data.apy);
+    } catch (error) {
+      console.error('Error fetching APY:', error);
+      toast.error('Failed to fetch APY.');
+    }
+  };
   // Fetch SOL price
   
 const fetchSolPrice = async () => {
@@ -116,7 +131,7 @@ const fetchTotalSolInPool = async () => {
   // Effect to calculate TVL on mount
   useEffect(() => {
     calculateTvl();
-
+    fetchApy();
     const interval = setInterval(calculateTvl, 30000); // Update every 30 seconds
     return () => clearInterval(interval);
   }, []);
@@ -173,7 +188,15 @@ const fetchTotalSolInPool = async () => {
               
             </div>
           </div>
-          <p className="text-white text-lg">
+          <div className="text-center mt-6">
+          <span className="text-gray-400 text-lg font-medium">
+            You could be earning up to
+            <span className="text-[#9945FF] font-bold"> {formatNumberWithCommas(apy * 100)}% </span> 
+            APY right now...
+          </span>
+        </div>
+        <br></br>
+          <p className="text-white text-sm">
             Select your <span className="text-[#9945FF]">Solana</span> wallet to continue!
           </p>
 
