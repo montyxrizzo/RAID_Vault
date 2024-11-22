@@ -2,11 +2,12 @@
 // import React from 'react';
 import { AppHero } from '../ui/ui-layout';
 import ParticleVisualization from './ParticleVisualization';
+import { Link } from 'react-router-dom';
 
 const links = [
-    { label: 'Community', href: 'https://discord.gg/GqcXHf3H', disable : false},
-    // { label: 'Whitepaper', href: '/whitepaper' },
-    // { label: 'Roadmap', href: '/roadmap' },
+    // { label: 'Community', href: 'https://discord.gg/GqcXHf3H', disable : false},
+    { label: 'Staking', to: '/account', className: "text-green-400 font-semibold", isInternal: true },  
+      { label: 'R-DAO', href: '/', disable :true },
     { label: 'Compute Client Portal', href: '/', disable :true },
     { label: 'GPU Provider Program', href: 'https://github.com/montyxrizzo/GPU_Provider_Program',rel:"noopener noreferrer",
         className:"text-green-400 font-semibold",  disable :true },
@@ -22,7 +23,7 @@ export default function DashboardFeature() {
                 {/* Particle background positioned absolutely */}
                 <div className="absolute inset-0 z-0">
                     <ParticleVisualization />
-                </div>
+                </div> 
 
                 {/* AppHero content positioned above particles */}
                 <div className="relative z-10">
@@ -56,53 +57,65 @@ export default function DashboardFeature() {
                     infrastructure.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
-  {links.map((link, index) => (
-    <a
-      key={index}
-      href={link.disable ? "#" : link.href}  // If disabled, set href to '#' (non-functional link)
-      target={link.disable ? "" : "_blank"}  // If disabled, don't open in new tab
-      rel={link.disable ? "" : link.rel || "noopener noreferrer"}  // If disabled, no rel
-      className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
-        link.className || "text-white font-semibold"
-      } ${link.disable ? "pointer-events-none opacity-50" : ""}`}  // Disable link interaction and add opacity
-    >
-      <p>{link.label}</p>
-    </a>
-  ))}
+  {links.map((link, index) => 
+    link.isInternal ? (
+      <Link
+        key={index}
+        to={link.disable ? "#" : link.to}  // If disabled, set `to` to '#' (non-functional link)
+        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+          link.className || "text-white font-semibold"
+        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
+      >
+        <p>{link.label}</p>
+      </Link>
+    ) : (
+      <a
+        key={index}
+        href={link.disable ? "#" : link.href}  // If disabled, set `href` to '#' (non-functional link)
+        target={link.disable ? "" : "_blank"}  // If disabled, don't open in new tab
+        rel={link.disable ? "" : link.rel || "noopener noreferrer"}  // If disabled, no rel
+        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+          link.className || "text-white font-semibold"
+        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
+      >
+        <p>{link.label}</p>
+      </a>
+    )
+  )}
 </div>
 
             </div>
 
             {/* Footer with Social Links */}
             <footer className="bg-indigo-800 text-white py-6 mt-12">
-                {/* <div className="flex justify-center space-x-8">
+                <div className="flex justify-center space-x-8">
                     <a
-                        href="https://discord.gg/"
+                        href="https://discord.gg/GqcXHf3H"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:text-teal-400 transition"
                     >
                         <img
-                            src="/icons/discord.svg"
+                            src="/icons8-discord.svg"
                             alt="Discord"
                             className="w-6 h-6"
                         />
                         <span className="font-medium">Join us on Discord</span>
                     </a>
                     <a
-                        href="https://twitter.com/"
+                        href="https://x.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:text-teal-400 transition"
                     >
                         <img
-                            src="/icons/twitter.svg"
-                            alt="X (formerly Twitter)"
+                            src="/icons8-x.svg"
+                            alt="X"
                             className="w-6 h-6"
                         />
                         <span className="font-medium">Follow us on X</span>
                     </a>
-                </div> */}
+                </div>
                 {/* <p className="text-sm text-gray-300 mt-4 text-center">
                
                 </p> */}
