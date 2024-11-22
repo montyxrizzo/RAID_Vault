@@ -126,9 +126,10 @@ const fetchTotalSolInPool = async () => {
   }
 
   return (
-    <div className="hero py-[64px]">
-      <div className="hero-content text-center">
-        <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
+    // <div className="hero py-[64px]">
+    <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
+      {/* <div className="hero-content text-center"> */}
+        
           <ToastContainer />
 
           {/* Header Section */}
@@ -172,10 +173,15 @@ const fetchTotalSolInPool = async () => {
               
             </div>
           </div>
+          <p className="text-white text-lg">
+            Select your <span className="text-[#9945FF]">Solana</span> wallet to continue!
+          </p>
+
+            <br></br>
           <WalletButton />
 
         </div>
-      </div>
-    </div>
+      // </div>
+    // </div>
   );
 }
