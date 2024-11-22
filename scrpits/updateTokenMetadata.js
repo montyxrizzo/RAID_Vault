@@ -1,37 +1,71 @@
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
-import fs from 'fs';
+import {readFileSync} from 'fs'
+const mintKeypair = JSON.parse(readFileSync('./keys/mint.json', 'utf8'));
 
+const extensions = [
+    ExtensionType.MetadataPointer,
+];
 
-// Constants
-const MINT_ADDRESS = 'CdNQmTvm56YWoox9twQA4Ha3rY4mZYLnxgsKQg6YXPDT';
-const METADATA_URI = 'https://raw.githubusercontent.com/montyxrizzo/RaidMetaData/refs/heads/main/slp_metadata.json';
-const UPDATE_AUTHORITY_PATH = 'keys/mint.json'; // Path to update authority keypair
+// Initialize the mint account with appropriate space and lamports
+const initAccountIx = SystemProgram.createAccount({
+    fromPubkey: payer.publicKey,
+    newAccountPubkey: mintKeypair,
+    lamports: await connection.getMinimumBalanceForRentExemption(getMintLen(extensions)),
+    space: getMintLen(extensions),
+    programId: TOKEN_2022_PROGRAM_ID,
+});
 
-(async () => {
-    // Initialize connection and identity
-    const connection = new Connection('https://api.devnet.solana.com'); // Change to mainnet if needed
-    const updateAuthority = Keypair.fromSecretKey(
-        Uint8Array.from(JSON.parse(fs.readFileSync(UPDATE_AUTHORITY_PATH, 'utf-8')))
-    );
-    const metaplex = Metaplex.make(connection).use(keypairIdentity(updateAuthority));
+// Initialize the metadata pointer with the given URL
+const initPointerIx = await createInitializeMetadataPointerInstruction(
+    mint.publicKey,
+    payer.publicKey,
+    mint.publicKey,
+    TOKEN_2022_PROGRAM_ID
+);
 
-    // Load mint public key
-    const mint = new PublicKey(MINT_ADDRESS);
+// Initialize the mint with a decimal value of 9 (commonly used for fungible tokens)
+const createInitializeMintIx = await createInitializeMint2Instruction(
+    mint.publicKey,
+    9, // RAID token decimals
+    payer.publicKey,
+    null,
+    TOKEN_2022_PROGRAM_ID
+);
 
-    // Fetch the current metadata
-    const nft = await metaplex.nfts().findByMint({ mint });
+const blockhash = await connection.getLatestBlockhash();
 
-    console.log('Current Metadata:', nft.metadata);
+const message = new TransactionMessage({
+    payerKey: payer.publicKey,
+    instructions: [initAccountIx, initPointerIx, createInitializeMintIx],
+    recentBlockhash: blockhash.blockhash,
+}).compileToV0Message();
 
-    // Update metadata
-    const { uri, name, symbol } = nft.metadata;
-    const updatedMetadata = await metaplex.nfts().update({
-        nftOrSft: nft,
-        name: 'Radeon', // New name
-        symbol: 'RAD', // New symbol
-        uri: METADATA_URI, // New URI
-    });
+const tx = new VersionedTransaction(message);
+tx.sign([payer, mint]);
 
-    console.log('Updated Metadata:', updatedMetadata);
-})();
+// Send and confirm the transaction
+const initMintSig = await connection.sendTransaction(tx);
+await connection.confirmTransaction({
+    signature: initMintSig,
+    ...blockhash,
+});
+
+// Use metadata initialization with the provided values
+const sig = await tokenMetadataInitializeWithRentTransfer(
+    connection,
+    payer,
+    mint.publicKey,
+    payer.publicKey,
+    payer,
+    "Remote AI Infrastructure Deployment", // Token name
+    "RAID",                                // Token symbol
+    "https://raw.githubusercontent.com/montyxrizzo/RaidMetaData/main/metadata.json", // Metadata URI
+    undefined,
+    undefined,
+    TOKEN_2022_PROGRAM_ID
+);
+
+console.log("Mint Address:", mint.publicKey.toBase58());
+
+// Retrieve and log the metadata for the token
+const metadata = await getTokenMetadata(connection, mint.publicKey);
+console.log("Metadata:", metadata);
