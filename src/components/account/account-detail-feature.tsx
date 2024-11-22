@@ -498,11 +498,12 @@ const claimRewards = async (publicKey: PublicKey) => {
         <ToastContainer />
         {/* Header Section */}
         <div className="max-w-3xl w-full text-center mb-8">
-          <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Community Staking Pool</h1>
+        <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking!</h1>
+
           <p className="text-gray-300 text-lg">
             Stake your SOL to help secure the network, 
-            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens 
-            — your gateway to affordable high-performance GPU resources.
+            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> to earn <span className="text-teal-400 font-semibold">RAID</span> tokens 
+            — your gateway to affordable high-performance GPU resources; an investment in the futures of both AI & Crypto.
           </p>
         </div>
 {/* TVL Dashboard */}
