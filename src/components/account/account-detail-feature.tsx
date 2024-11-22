@@ -552,7 +552,7 @@ useEffect(() => {
       <div className="flex justify-center mt-4">
         <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg">
           <animated.div>
-            {animatedTvl.number.to((val) =>
+            {animatedTvl.number.to((val: number) =>
               `$${formatNumberWithCommasAndDecimals(val)}`
             )}
           </animated.div>
