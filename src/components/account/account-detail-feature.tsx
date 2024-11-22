@@ -500,267 +500,299 @@ const claimRewards = async (publicKey: PublicKey) => {
         };
     }
   }, [connected,setAnimatedTvl,tvl]);
-  return (
+ return (
+  <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
+    <ToastContainer />
 
-    <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
-        <ToastContainer />
-        {/* Header Section */}
-        <div className="max-w-3xl w-full text-center mb-8">
-          <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking! 🚀</h1>
-
-          <p className="text-gray-300 text-lg">
-            Stake your SOL to help secure the network, 
-            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> to earn <span className="text-teal-400 font-semibold">RAID</span> tokens 
-            — your gateway to affordable high-performance GPU resources; an investment in the futures of both AI & Crypto.
-          </p>
-        </div>
-{/* TVL Dashboard */}
-<div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
-  <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
-    Vault Metrics
-  </h2>
-  <p className="text-gray-300 text-center text-lg">
-    <strong>Total SOL in Pools:</strong>{' '}
-    <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
-  </p>
-  <p className="text-gray-300 text-center text-lg">
-    <strong>SOL Price:</strong>{' '}
-    <span className="text-white">${formatNumberDecimals(solPrice)} USD</span>
-  </p>
-  <p className="text-center text-2xl font-bold text-teal-300 mt-6">
-    Total Value Locked (TVL):
-  </p>
-  <div className="flex justify-center mt-4">
-    <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg">
-      <animated.div>
-        {animatedTvl.number.to((val) =>
-          `$${formatNumberWithCommasAndDecimals(val)}`
-        )}
-      </animated.div>
+    {/* Header Section */}
+    <div className="max-w-3xl w-full text-center mb-8">
+      <h1 className="text-4xl font-bold text-teal-400 mb-4">
+        Earn <span className="text-white">RAID</span> by Staking! 🚀
+      </h1>
+      <p className="text-gray-300 text-lg">
+        Stake your SOL to help secure the network, earn rewards, and receive{" "}
+        <span className="text-teal-400 font-semibold">RADEON</span> to earn{" "}
+        <span className="text-teal-400 font-semibold">RAID</span> tokens —
+        your gateway to affordable high-performance GPU resources; an
+        investment in the futures of both AI & Crypto.
+      </p>
     </div>
-  </div>
-</div>
 
+    {/* TVL Dashboard */}
+    <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
+      <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
+        Vault Metrics
+      </h2>
+      <p className="text-gray-300 text-center text-lg">
+        <strong>Total SOL in Pools:</strong>{" "}
+        <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
+      </p>
+      <p className="text-gray-300 text-center text-lg">
+        <strong>SOL Price:</strong>{" "}
+        <span className="text-white">${formatNumberDecimals(solPrice)} USD</span>
+      </p>
+      <p className="text-center text-2xl font-bold text-teal-300 mt-6">
+        Total Value Locked (TVL):
+      </p>
+      <div className="flex justify-center mt-4">
+        <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg">
+          <animated.div>
+            {animatedTvl.number.to((val) =>
+              `$${formatNumberWithCommasAndDecimals(val)}`
+            )}
+          </animated.div>
+        </div>
+      </div>
+    </div>
 
-    
+    {/* Wallet-Specific Sections */}
+    {connected ? (
+      <>
         {/* Account Details */}
         <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Account Details</h2>
+          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">
+            Account Details
+          </h2>
           <div className="mb-4">
             <p className="text-gray-300">
-              <strong>Wallet Balance:</strong> <span className="text-white">{walletBalance} SOL</span>
+              <strong>Wallet Balance:</strong>{" "}
+              <span className="text-white">{walletBalance} SOL</span>
             </p>
             <p className="text-gray-300">
-              <strong>Staked Amount:</strong> <span className="text-white">{stakedAmount} Pool Tokens (Radeon)</span>
+              <strong>Staked Amount:</strong>{" "}
+              <span className="text-white">{stakedAmount} Pool Tokens (Radeon)</span>
             </p>
             <p className="text-gray-300">
-              <strong>Claimable Rewards:</strong> 
+              <strong>Claimable Rewards:</strong>{" "}
               <span className="text-teal-300">
-                {claimableRewards !== undefined 
-                  ? ` ${claimableRewards.toFixed(10)} RAID` 
+                {claimableRewards !== undefined
+                  ? ` ${claimableRewards.toFixed(10)} RAID`
                   : " Loading..."}
               </span>
             </p>
             <p className="text-gray-300">
-              <strong>Current APY:</strong> <span className="text-teal-400">{formatNumberWithCommas((apy * 100))}%</span>
+              <strong>Current APY:</strong>{" "}
+              <span className="text-teal-400">
+                {formatNumberWithCommas(apy * 100)}%
+              </span>
             </p>
           </div>
           <button
             onClick={() => {
               if (!publicKey) {
-                toast.error("Wallet not connected."); 
+                toast.error("Wallet not connected.");
                 return;
               }
               claimRewards(publicKey);
             }}
-            className={`w-full py-2 px-4 font-medium rounded 
-              ${claimableRewards > 0 
-                ? "bg-teal-500 hover:bg-teal-600 text-white" 
-                : "bg-gray-500 text-gray-400 cursor-not-allowed"}`}
+            className={`w-full py-2 px-4 font-medium rounded ${
+              claimableRewards > 0
+                ? "bg-teal-500 hover:bg-teal-600 text-white"
+                : "bg-gray-500 text-gray-400 cursor-not-allowed"
+            }`}
             disabled={claimableRewards <= 0}
           >
             Claim RAID Rewards
           </button>
         </div>
-    
+
+        {/* Vault Toggle */}
         <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-  {/* <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Vaults</h2> */}
-  
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="max-w-3xl w-full text-center mb-8">
+              <h1 className="text-4xl font-bold text-teal-400 mb-4">The Vault 🔒</h1>
+              <p className="text-gray-300 text-lg">
+                Switch between staking SOL in the RAID Community Stake Pool or
+                managing your RAID/SOL LP tokens.
+              </p>
+            </div>
 
-    {/* Header */}
-    <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-4xl font-bold text-teal-400 mb-4">The Vault 🔒</h1>
-        <p className="text-gray-300 text-lg">
-          Switch between staking SOL in the RAID Community Stake Pool or managing your RAID/SOL LP tokens.
-        </p>
-      </div>
+            {/* Toggle Switch */}
+            <div className="flex justify-center items-center mb-6">
+              <button
+                className={`px-4 py-2 font-semibold rounded-l ${
+                  activeView === "SOL Stake Pool"
+                    ? "bg-teal-500 text-white"
+                    : "bg-gray-700 text-gray-300"
+                }`}
+                onClick={() => setActiveView("SOL Stake Pool")}
+              >
+                Sol Stake Pool
+              </button>
+              <button
+                className={`px-4 py-2 font-semibold rounded-r ${
+                  activeView === "SOL/RAID LP"
+                    ? "bg-teal-500 text-white"
+                    : "bg-gray-700 text-gray-300"
+                }`}
+                onClick={() => setActiveView("SOL/RAID LP")}
+              >
+                RAID/SOL LP
+              </button>
+            </div>
 
-      {/* Toggle Switch */}
-      <div className="flex justify-center items-center mb-6">
-        <button
-          className={`px-4 py-2 font-semibold rounded-l ${
-            activeView === "SOL Stake Pool"
-              ? "bg-teal-500 text-white"
-              : "bg-gray-700 text-gray-300"
-          }`}
-          onClick={() => setActiveView("SOL Stake Pool")}
-        >
-          Sol Stake Pool
-        </button>
-        <button
-          className={`px-4 py-2 font-semibold rounded-r ${
-            activeView === "SOL/RAID LP"
-              ? "bg-teal-500 text-white"
-              : "bg-gray-700 text-gray-300"
-          }`}
-          onClick={() => setActiveView("SOL/RAID LP")}
-        >
-          RAID/SOL LP
-        </button>
-      </div>
+            {/* Conditional Views */}
+            {activeView === "SOL Stake Pool" && (
+              <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+                {/* Stake and Withdraw Sections */}
+                <div className="flex flex-col lg:flex-row lg:gap-6">
+                  <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+                    <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">
+                      Stake SOL
+                    </h3>
+                    <div className="mb-4">
+                      <input
+                        type="number"
+                        value={amountToStake}
+                        onChange={(e) => setAmountToStake(Number(e.target.value))}
+                        placeholder="Amount to Stake"
+                        className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-center mb-4">
+                      <button
+                        onClick={() => setAmountToStake(walletBalance * 0.25)}
+                        className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+                      >
+                        25%
+                      </button>
+                      <button
+                        onClick={() => setAmountToStake(walletBalance * 0.5)}
+                        className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+                      >
+                        50%
+                      </button>
+                      <button
+                        onClick={() => setAmountToStake(walletBalance - 0.001)}
+                        className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
+                      >
+                        MAX
+                      </button>
+                    </div>
+                    <button
+                      onClick={stakeSol}
+                      className={`w-full py-3 px-4 font-medium rounded ${
+                        loading || amountToStake <= 0 || amountToStake > walletBalance
+                          ? "bg-gray-500 text-gray-400 cursor-not-allowed"
+                          : "bg-teal-500 hover:bg-teal-600 text-white"
+                      }`}
+                      disabled={
+                        loading || amountToStake <= 0 || amountToStake > walletBalance
+                      }
+                    >
+                      {loading ? "Processing..." : "Stake"}
+                    </button>
+                  </div>
 
-     {/* Conditional Views */}
-{activeView === "SOL Stake Pool" && (
-  <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+                  <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
+                    <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">
+                      Withdraw SOL
+                    </h3>
+                    <div className="mb-4">
+                      <input
+                        type="number"
+                        value={amountToWithdraw}
+                        onChange={(e) =>
+                          setAmountToWithdraw(Number(e.target.value))
+                        }
+                        placeholder="Amount to Withdraw"
+                        className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-center mb-4">
+                      <button
+                        onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+                      >
+                        25%
+                      </button>
+                      <button
+                        onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+                      >
+                        50%
+                      </button>
+                      <button
+                        onClick={() => setAmountToWithdraw(stakedAmount)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+                      >
+                        MAX
+                      </button>
+                    </div>
+                    <button
+                      onClick={withdrawStake}
+                      className={`w-full py-3 px-4 font-medium rounded ${
+                        loading ||
+                        amountToWithdraw <= 0 ||
+                        amountToWithdraw > stakedAmount
+                          ? "bg-gray-500 text-gray-400 cursor-not-allowed"
+                          : "bg-red-500 hover:bg-red-600 text-white"
+                      }`}
+                      disabled={
+                        loading ||
+                        amountToWithdraw <= 0 ||
+                        amountToWithdraw > stakedAmount
+                      }
+                    >
+                      {loading ? "Processing..." : "Withdraw"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
-    {/* Responsive Container for Stake and Withdraw Sections */}
-    <div className="flex flex-col lg:flex-row lg:gap-6">
-      {/* Stake SOL Section */}
-      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
-        <h3 className="text-xl font-semibold text-teal-400 mb-4 text-center">Stake SOL</h3>
-        <div className="mb-4">
-          <input
-            type="number"
-            value={amountToStake}
-            onChange={(e) => setAmountToStake(Number(e.target.value))}
-            placeholder="Amount to Stake"
-            className="w-full px-4 py-3 text-lg border border-teal-600 rounded-lg focus:outline-none focus:ring focus:ring-teal-500"
-          />
-        </div>
-        <div className="flex gap-2 justify-center mb-4">
-          <button
-            onClick={() => setAmountToStake(walletBalance * 0.25)}
-            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-          >
-            25%
-          </button>
-          <button
-            onClick={() => setAmountToStake(walletBalance * 0.5)}
-            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-          >
-            50%
-          </button>
-          <button
-            onClick={() => setAmountToStake(walletBalance - 0.001)}
-            className="px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700"
-          >
-            MAX
-          </button>
-        </div>
-        <button
-  onClick={stakeSol}
-  className={`w-full py-3 px-4 font-medium rounded ${
-    loading || amountToStake <= 0 || amountToStake > walletBalance
-      ? 'bg-gray-500 text-gray-400 cursor-not-allowed'
-      : 'bg-teal-500 hover:bg-teal-600 text-white'
-  }`}
-  disabled={loading || amountToStake <= 0 || amountToStake > walletBalance}
->
-  {loading ? 'Processing...' : 'Stake'}
-</button>
-      </div>
-
-      {/* Withdraw SOL Section */}
-      <div className="bg-gray-900 p-4 rounded-lg shadow flex-1">
-        <h3 className="text-xl font-semibold text-red-400 mb-4 text-center">Withdraw SOL</h3>
-        <div className="mb-4">
-          <input
-            type="number"
-            value={amountToWithdraw}
-            onChange={(e) => setAmountToWithdraw(Number(e.target.value))}
-            placeholder="Amount to Withdraw"
-            className="w-full px-4 py-3 text-lg border border-red-600 rounded-lg focus:outline-none focus:ring focus:ring-red-500"
-          />
-        </div>
-        <div className="flex gap-2 justify-center mb-4">
-          <button
-            onClick={() => setAmountToWithdraw(stakedAmount * 0.25)}
-            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-          >
-            25%
-          </button>
-          <button
-            onClick={() => setAmountToWithdraw(stakedAmount * 0.5)}
-            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-          >
-            50%
-          </button>
-          <button
-            onClick={() => setAmountToWithdraw(stakedAmount)}
-            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-          >
-            MAX
-          </button>
-        </div>
-        <button
-  onClick={withdrawStake}
-  className={`w-full py-3 px-4 font-medium rounded ${
-    loading || amountToWithdraw <= 0 || amountToWithdraw > stakedAmount
-      ? 'bg-gray-500 text-gray-400 cursor-not-allowed'
-      : 'bg-red-500 hover:bg-red-600 text-white'
-  }`}
-  disabled={loading || amountToWithdraw <= 0 || amountToWithdraw > stakedAmount}
->
-  {loading ? 'Processing...' : 'Withdraw'}
-</button>
-      </div>
-    </div>
-  </div>
-)}
-
-      {activeView === "SOL/RAID LP" && (
-        <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">RAID/SOL LP</h2>
-          <div className="mb-4">
-            <p className="text-gray-300">
-              <strong>Wallet Balance:</strong> <span className="text-white">- RAID/SOL LP Tokens</span>
-            </p>
+            {activeView === "SOL/RAID LP" && (
+              <div className="w-full max-w-xl bg-gray-800 shadow-lg rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">
+                  RAID/SOL LP
+                </h2>
+                <div className="mb-4">
+                  <p className="text-gray-300">
+                    <strong>Wallet Balance:</strong>{" "}
+                    <span className="text-white">- RAID/SOL LP Tokens</span>
+                  </p>
+                </div>
+                <button
+                  disabled
+                  className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed"
+                >
+                  Deposit LP Tokens (Coming Soon)
+                </button>
+                <button
+                  disabled
+                  className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed mt-4"
+                >
+                  Withdraw LP Tokens (Coming Soon)
+                </button>
+              </div>
+            )}
+            
           </div>
-          <button
-            disabled
-            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed"
-          >
-            Deposit LP Tokens (Coming Soon)
-          </button>
-          <button
-            disabled
-            className="w-full py-2 px-4 font-medium rounded bg-gray-600 text-gray-400 cursor-not-allowed mt-4"
-          >
-            Withdraw LP Tokens (Coming Soon)
-          </button>
+          {errorMessage && (
+          <div className="mt-4 p-4 bg-red-100 text-red-800 rounded max-w-xl w-full">
+            <p>{errorMessage}</p>
+            {errorMessage.includes('Check transaction:') && (
+              <a
+                href={`https://explorer.solana.com/tx/${errorMessage.split('Check transaction: ')[1]}?cluster=mainnet-beta`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                View on Solana Explorer
+              </a>
+            )}
+          </div>
+        )}
+
         </div>
-      )}
-    </div>
-    {errorMessage && (
-  <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
-    <p>{errorMessage}</p>
-    {errorMessage.includes('Check transaction:') && (
-      <a
-        href={`https://explorer.solana.com/tx/${errorMessage.split('Check transaction: ')[1]}?cluster=mainnet-beta`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-500 underline"
-      >
-        View on Solana Explorer
-      </a>
+      </>
+    ) : (
+      <p className="text-gray-400 text-lg">
+        Connect your wallet to view staking details.
+      </p>
     )}
   </div>
-)}
+);
 
-    </div>
-      </div>
-    );
-    
   
 }
