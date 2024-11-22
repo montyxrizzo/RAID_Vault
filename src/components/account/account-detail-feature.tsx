@@ -27,7 +27,7 @@ import {
 
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useEffect, useState,useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
@@ -68,25 +68,7 @@ export default function AccountDetailFeature() {
   const [activeView, setActiveView] = useState<"SOL Stake Pool" | "SOL/RAID LP">("SOL Stake Pool");
   const [loading, setLoading] = useState<boolean>(false); // To indicate loading
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
-  const errorMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Function to set error message with auto-clear
-  const setErrorWithTimeout = (message: string) => {
-    clearErrorMessage(); // Clear any existing messages and timeouts
-    setErrorMessage(message);
-    errorMessageTimeoutRef.current = setTimeout(() => {
-      setErrorMessage(null);
-    }, 45000); // Clear error after 45 seconds
-  };
-
-  // Clear error message and clear timeout
-  const clearErrorMessage = () => {
-    if (errorMessageTimeoutRef.current) {
-      clearTimeout(errorMessageTimeoutRef.current);
-      errorMessageTimeoutRef.current = null;
-    }
-    setErrorMessage(null);
-  };
+  
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
   const formatNumberWithCommas = (num: number): string => {
@@ -295,7 +277,7 @@ const calculateTvl = async () => {
         ? `Check transaction: ${transactionSignature}`
         : 'An error occurred. Please try again.';
   
-      setErrorWithTimeout(transactionMessage);
+      setErrorMessage(transactionMessage);
       toast.error(`Failed to stake SOL. ${transactionMessage}`);
     } finally {
       setLoading(false); // Stop loading
@@ -349,7 +331,7 @@ const withdrawStake = async () => {
       ? `Check transaction: ${transactionSignature}`
       : 'An error occurred. Please try again.';
 
-    setErrorWithTimeout(transactionMessage);
+    setErrorMessage(transactionMessage);
     toast.error(`Failed to withdraw SOL. ${transactionMessage}`);
   } finally {
     setLoading(false); // Stop loading
@@ -491,9 +473,6 @@ const claimRewards = async (publicKey: PublicKey) => {
       fetchStakedBalance();
       fetchApy();
       calculateTvl();
-      if (errorMessageTimeoutRef.current) {
-        clearTimeout(errorMessageTimeoutRef.current);
-      }
       // Fetch SOL price every 30 minutes
       const priceInterval = setInterval(fetchSolPrice, 30 * 60 * 1000);
 
@@ -519,7 +498,7 @@ const claimRewards = async (publicKey: PublicKey) => {
         <ToastContainer />
         {/* Header Section */}
         <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking! 🚀</h1>
+          <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking! 🚀</h1>
 
           <p className="text-gray-300 text-lg">
             Stake your SOL to help secure the network, 
