@@ -24,6 +24,9 @@ import {
   createMintToInstruction,
 } from '@solana/spl-token';
 
+import { useSpring, animated } from '@react-spring/web';
+
+
 
 
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -68,7 +71,11 @@ export default function AccountDetailFeature() {
   const [activeView, setActiveView] = useState<"SOL Stake Pool" | "SOL/RAID LP">("SOL Stake Pool");
   const [loading, setLoading] = useState<boolean>(false); // To indicate loading
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // To display error messages
-  
+  // Inside your component:
+  const [animatedTvl, setAnimatedTvl] = useSpring(() => ({
+    number: 0, // Initial value
+    config: { tension: 120, friction: 14 },
+  }));
   //const [isModalOpen, setIsModalOpen] = useState(true);
   //const [canAccept, setCanAccept] = useState(false);
   const formatNumberWithCommas = (num: number): string => {
@@ -158,6 +165,7 @@ const calculateTvl = async () => {
   const solPrice = await fetchSolPrice();
   const calculatedTvl = solQuantity * solPrice;
   setTvl(calculatedTvl);
+  setAnimatedTvl({ number: calculatedTvl });
 };
 
     // Modal Scroll Handler
@@ -491,7 +499,7 @@ const claimRewards = async (publicKey: PublicKey) => {
           clearInterval(rewardsInterval);
         };
     }
-  }, [connected]);
+  }, [connected,setAnimatedTvl,tvl]);
   return (
 
     <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
@@ -508,20 +516,31 @@ const claimRewards = async (publicKey: PublicKey) => {
         </div>
 {/* TVL Dashboard */}
 <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
-  <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">Staking Program TVL</h2>
-  <p className="text-gray-300">
-    <strong>Total SOL in Pool:</strong>{' '}
+  <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
+    Vault Metrics
+  </h2>
+  <p className="text-gray-300 text-center text-lg">
+    <strong>Total SOL in Pools:</strong>{' '}
     <span className="text-white">{formatNumberDecimals(totalSolInPool)} SOL</span>
   </p>
-  <p className="text-gray-300">
+  <p className="text-gray-300 text-center text-lg">
     <strong>SOL Price:</strong>{' '}
     <span className="text-white">${formatNumberDecimals(solPrice)} USD</span>
   </p>
-  <p className="text-gray-300">
-    <strong>Total Value Locked (TVL):</strong>{' '}
-    <span className="text-teal-300">${formatNumberWithCommasAndDecimals(tvl)} USD</span>
+  <p className="text-center text-2xl font-bold text-teal-300 mt-6">
+    Total Value Locked (TVL):
   </p>
+  <div className="flex justify-center mt-4">
+    <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg">
+      <animated.div>
+        {animatedTvl.number.to((val) =>
+          `$${formatNumberWithCommasAndDecimals(val)}`
+        )}
+      </animated.div>
+    </div>
+  </div>
 </div>
+
 
     
         {/* Account Details */}
