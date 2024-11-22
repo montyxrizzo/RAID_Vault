@@ -17,6 +17,7 @@ import {
 export default function AccountListFeature() {
   const { publicKey } = useWallet();
   const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
+  const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 
   // TVL State and Animation
   const [totalSolInPool, setTotalSolInPool] = useState<number>(0);
@@ -41,27 +42,35 @@ export default function AccountListFeature() {
     }).format(num);
 
   // Fetch SOL price
-  const fetchSolPrice = async () => {
-    const currentTime = Date.now();
-    const thirtyMinutesInMs = 30 * 60 * 1000;
+  
+const fetchSolPrice = async () => {
+  const currentTime = Date.now();
+  const thirtyMinutesInMs = 30 * 60 * 1000;
 
-    if (currentTime - lastPriceFetchTime < thirtyMinutesInMs && solPrice > 0) {
-      return solPrice;
+  if (currentTime - lastPriceFetchTime < thirtyMinutesInMs && solPrice > 0) {
+    console.log('Using cached SOL price');
+    return solPrice;
+  }
+
+  try {
+    // Use the backend endpoint to fetch the SOL price
+    const response = await fetch(`${API_BASE_URL}/staking-data/sol-price`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch SOL price. Status: ${response.status}`);
     }
 
-    try {
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-      const data = await response.json();
-      const price = data.solana.usd;
-      setSolPrice(price);
-      setLastPriceFetchTime(currentTime);
-      return price;
-    } catch (error) {
-      console.error('Error fetching SOL price:', error);
-      toast.error('Failed to fetch SOL price.');
-      return solPrice; // Fallback to last known price
-    }
-  };
+    const data = await response.json();
+    const price = data.price; // Adjust this if your API returns a different structure
+    setSolPrice(price);
+    setLastPriceFetchTime(currentTime); // Update the last fetch time
+    console.log('Fetched new SOL price from backend:', price);
+    return price;
+  } catch (error) {
+    console.error('Error fetching SOL price:', error);
+    return solPrice; // Return the last known price if fetching fails
+  }
+};
   const STAKE_ACCOUNT = new PublicKey('8KNDibG6RAc1tE2i3UKboiQ1tdf7JuwLWjCTnVNChcP9');
 
   
