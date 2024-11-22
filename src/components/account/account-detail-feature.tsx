@@ -80,6 +80,12 @@ export default function AccountDetailFeature() {
       maximumFractionDigits: 2,
     }).format(num);
   };
+  const formatNumberWithCommasAndDecimals = (num: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(num);
+  };
   
   
 // Fetch total SOL in the stake pool
@@ -512,7 +518,7 @@ const claimRewards = async (publicKey: PublicKey) => {
   </p>
   <p className="text-gray-300">
     <strong>Total Value Locked (TVL):</strong>{' '}
-    <span className="text-teal-300">${formatNumberWithCommas(Number(formatNumberDecimals(tvl)))} USD</span>
+    <span className="text-teal-300">${formatNumberWithCommasAndDecimals(tvl)} USD</span>
   </p>
 </div>
 
