@@ -519,7 +519,7 @@ const claimRewards = async (publicKey: PublicKey) => {
         <ToastContainer />
         {/* Header Section */}
         <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking!</h1>
+        <h1 className="text-4xl font-bold text-teal-400 mb-4">Earn <span className="text-white">RAID</span> by Staking! 🚀</h1>
 
           <p className="text-gray-300 text-lg">
             Stake your SOL to help secure the network, 
