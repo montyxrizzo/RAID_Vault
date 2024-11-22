@@ -500,9 +500,9 @@ const claimRewards = async (publicKey: PublicKey) => {
         <div className="max-w-3xl w-full text-center mb-8">
           <h1 className="text-4xl font-bold text-teal-400 mb-4">RAID Community Staking Pool</h1>
           <p className="text-gray-300 text-lg">
-            Join the RAID community-run staking pool on Solana. Stake your SOL to help secure the network, 
-            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens. 
-            These tokens can be used across Solana’s DeFi ecosystem to maximize your potential.
+            Stake your SOL to help secure the network, 
+            earn rewards, and receive <span className="text-teal-400 font-semibold">RADEON</span> and <span className="text-teal-400 font-semibold">RAID</span> tokens 
+            — your gateway to affordable high-performance GPU resources.
           </p>
         </div>
 {/* TVL Dashboard */}
