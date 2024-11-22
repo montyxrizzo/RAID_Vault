@@ -473,14 +473,26 @@ const claimRewards = async (publicKey: PublicKey) => {
   
 };
 
+useEffect(() => {
+  // Fetch public data on mount
+  fetchSolPrice();
+  calculateTvl();
+  fetchApy();
+}, []);
+
+
+
 
   useEffect(() => {
+    fetchSolPrice(); // Initial fetch
+    fetchApy();
+    calculateTvl();
+
     if (connected) {
-      fetchSolPrice(); // Initial fetch
+ 
       fetchWalletBalance();
       fetchStakedBalance();
-      fetchApy();
-      calculateTvl();
+
       // Fetch SOL price every 30 minutes
       const priceInterval = setInterval(fetchSolPrice, 30 * 60 * 1000);
 
@@ -497,9 +509,12 @@ const claimRewards = async (publicKey: PublicKey) => {
         return () => {
           clearInterval(priceInterval);
           clearInterval(rewardsInterval);
+          
         };
     }
   }, [connected,setAnimatedTvl,tvl]);
+
+
  return (
   <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
     <ToastContainer />
