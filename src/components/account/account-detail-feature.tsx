@@ -565,19 +565,33 @@ useEffect(() => {
       <>
         {/* Account Details */}
         <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold text-teal-400 mb-4 text-center">
+          <h2 className="text-2xl text-white font-bold text-teal-400 mb-4 text-center">
             Account Details
           </h2>
           <div className="mb-4">
             <p className="text-gray-300">
               <strong>Wallet Balance:</strong>{" "}
-              <span className="text-white">{walletBalance} SOL</span>
+              <span className="text-teal-300">{walletBalance} SOL</span>
             </p>
             <p className="text-gray-300">
               <strong>Staked Amount:</strong>{" "}
-              <span className="text-white">{stakedAmount} Pool Tokens (Radeon)</span>
+              <span className="text-teal-300">{stakedAmount} Pool Tokens (Radeon)</span>
+            </p>
+            
+            <p className="text-gray-300">
+              <strong>Current APY:</strong>{" "}
+              <span className="text-teal-400">
+                {formatNumberWithCommas(apy * 100)}%
+              </span>
             </p>
             <p className="text-gray-300">
+              <strong>Reward Multiplier:</strong>{" "}
+              <span className="text-teal-400">
+                4 X
+              </span>
+            </p>
+          </div>
+          <p className="text-gray-300">
               <strong>Claimable Rewards:</strong>{" "}
               <span className="text-teal-300">
                 {claimableRewards !== undefined
@@ -585,13 +599,7 @@ useEffect(() => {
                   : " Loading..."}
               </span>
             </p>
-            <p className="text-gray-300">
-              <strong>Current APY:</strong>{" "}
-              <span className="text-teal-400">
-                {formatNumberWithCommas(apy * 100)}%
-              </span>
-            </p>
-          </div>
+            <br></br>
           <button
             onClick={() => {
               if (!publicKey) {
