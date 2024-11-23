@@ -5,7 +5,7 @@ import ParticleVisualization from './ParticleVisualization';
 import { Link } from 'react-router-dom';
 
 const links = [
-    // { label: 'Community', href: 'https://discord.gg/GqcXHf3H', disable : false},
+
     { label: 'Staking', to: '/account', className: "text-green-400 font-semibold", isInternal: true },  
       { label: 'R-DAO', href: '/', disable :true },
     { label: 'Compute Client Portal', href: '/', disable :true },
@@ -57,32 +57,32 @@ export default function DashboardFeature() {
                     infrastructure.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
-  {links.map((link, index) => 
-    link.isInternal ? (
-      <Link
-        key={index}
-        to={link.disable ? "#" : link.to}  // If disabled, set `to` to '#' (non-functional link)
-        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
-          link.className || "text-white font-semibold"
-        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
-      >
-        <p>{link.label}</p>
-      </Link>
-    ) : (
-      <a
-        key={index}
-        href={link.disable ? "#" : link.href}  // If disabled, set `href` to '#' (non-functional link)
-        target={link.disable ? "" : "_blank"}  // If disabled, don't open in new tab
-        rel={link.disable ? "" : link.rel || "noopener noreferrer"}  // If disabled, no rel
-        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
-          link.className || "text-white font-semibold"
-        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
-      >
-        <p>{link.label}</p>
-      </a>
-    )
-  )}
-</div>
+                {links.map((link, index) => 
+                    link.isInternal ? (
+                    <Link
+                        key={index}
+                        to={link.disable ? "#" : link.to}  // If disabled, set `to` to '#' (non-functional link)
+                        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+                        link.className || "text-white font-semibold"
+                        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
+                    >
+                        <p>{link.label}</p>
+                    </Link>
+                    ) : (
+                    <a
+                        key={index}
+                        href={link.disable ? "#" : link.href}  // If disabled, set `href` to '#' (non-functional link)
+                        target={link.disable ? "" : "_blank"}  // If disabled, don't open in new tab
+                        rel={link.disable ? "" : link.rel || "noopener noreferrer"}  // If disabled, no rel
+                        className={`transition transform hover:-translate-y-1 hover:scale-105 hover:bg-indigo-700 text-center p-4 rounded-lg shadow-lg bg-indigo-800 ${
+                        link.className || "text-white font-semibold"
+                        } ${link.disable ? "pointer-events-none opacity-50" : ""}`} // Disable link interaction and add opacity
+                    >
+                        <p>{link.label}</p>
+                    </a>
+                    )
+                )}
+                </div>
 
             </div>
 
@@ -116,9 +116,6 @@ export default function DashboardFeature() {
                         <span className="font-small">Follow us on X</span>
                     </a>
                 </div>
-                {/* <p className="text-sm text-gray-300 mt-4 text-center">
-               
-                </p> */}
             </footer>
         </div>
     );

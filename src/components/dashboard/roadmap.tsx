@@ -12,7 +12,7 @@ const milestones: RoadmapMilestone[] = [
     quarter: "Q4 2024",
     title: "Launch RAID Token",
     description:
-      "Initial token launch on Solana blockchain with foundational infrastructure for GPU contributions.",
+      "Initial token stealth launch on Solana blockchain.",
     achieved: true,
   },
   {
