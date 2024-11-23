@@ -100,10 +100,10 @@ export default function DashboardFeature() {
                             alt="Discord"
                             className="w-6 h-6"
                         />
-                        <span className="font-medium">Join us on Discord</span>
+                        <span className="font-small">Join us on Discord</span>
                     </a>
                     <a
-                        href="https://x.com/"
+                        href="https://x.com/raidnetfinance?s=11"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 hover:text-teal-400 transition"
@@ -113,7 +113,7 @@ export default function DashboardFeature() {
                             alt="X"
                             className="w-6 h-6"
                         />
-                        <span className="font-medium">Follow us on X</span>
+                        <span className="font-small">Follow us on X</span>
                     </a>
                 </div>
                 {/* <p className="text-sm text-gray-300 mt-4 text-center">
