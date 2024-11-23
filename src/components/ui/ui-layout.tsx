@@ -66,7 +66,7 @@ return (
               </Link>
             </li>
           ))}
-          <li>
+          {/* <li>
             <a
               href="https://v2.raydium.io/swap/"
               target="_blank"
@@ -75,7 +75,7 @@ return (
             >
               #GET RAID
             </a>
-          </li>
+          </li> */}
         </ul>
 
         {/* Wallet and Cluster Select */}
