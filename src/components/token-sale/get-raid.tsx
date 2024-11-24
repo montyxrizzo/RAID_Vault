@@ -7,10 +7,7 @@ SystemProgram,
   Keypair,
   //sendAndConfirmTransaction
 } from '@solana/web3.js';
-import {
-  depositSol,
-  withdrawSol,
-} from '@solana/spl-stake-pool';
+
 import {
   //getOrCreateAssociatedTokenAccount,
   //createTransferCheckedInstruction,
@@ -19,12 +16,11 @@ import {
 
   getAssociatedTokenAddress,
 
-  TOKEN_PROGRAM_ID,
 
   createMintToInstruction,
 } from '@solana/spl-token';
 
-import { useSpring, animated } from '@react-spring/web';
+//import { useSpring, animated } from '@react-spring/web';
 
 
 
@@ -36,14 +32,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { toast } from "react-hot-toast";
 import { toast } from "react-toastify";
-const PRESALE_WALLET = new PublicKey(
-  "H1SkWxyCZ1tAtSQ3xHaPrW5cs4N1EvJhpc7LCNtDN2sB"
-);
+
 
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
 const RAID_PER_SOL = 1000; // Example conversion rate: 1000 RAID per SOL
 const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
-
+ 
 export default function PresalePage() {
   const [progress, setProgress] = useState(0);
   const [raidSold, setRaidSold] = useState(0);
@@ -52,7 +46,7 @@ export default function PresalePage() {
   const [raidAmount, setRaidAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { publicKey, sendTransaction, connected } = useWallet();
-  const DECIMALS = 9; // Number of decimals for RAID token
+  //const DECIMALS = 9; // Number of decimals for RAID token
 
 
   // const formatNumberWithCommas = (num: number): string => {
@@ -123,81 +117,6 @@ export default function PresalePage() {
       throw error;
     }
   }
-  const claimRewards = async (publicKey: PublicKey, raidAmount: number) => {
-    if (!publicKey) {
-      toast.error("Wallet not connected.");
-      return;
-    }
-  
-    try {
-      const RAID_MINT_ADDRESS = new PublicKey("HNEgW597ZQwZAVL8iEaAc3aKv735pFTspVLqrJESpoth");
-      const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
-      const DECIMALS = 9;
-  
-      // const mintAuthorityKeypair = await getMintAuthorityKeypair();
-      const payerKeyPair = await getPayerKeypair();
-      const mintAuthorityKeypair = await getMintAuthorityKeypair();
-      console.log("Mint Authority Public Key:", mintAuthorityKeypair.publicKey.toBase58());
-      console.log("Payer Public Key:", payerKeyPair.publicKey.toBase58());
-  
-      const userTokenAccount = await getAssociatedTokenAddress(
-        RAID_MINT_ADDRESS,
-        publicKey,
-        false,
-        CUSTOM_TOKEN_PROGRAM_ID
-      );
-  
-      console.log("User Token Account:", userTokenAccount.toBase58());
-  
-      const transaction = new Transaction();
-  
-      const userAccountExists = await connection.getAccountInfo(userTokenAccount);
-      if (!userAccountExists) {
-        transaction.add(
-          createAssociatedTokenAccountInstruction(
-            publicKey, // Fee payer
-            userTokenAccount, // Associated token account
-            publicKey, // Owner
-            RAID_MINT_ADDRESS, // Mint
-            CUSTOM_TOKEN_PROGRAM_ID // Token program ID
-          )
-        );
-      }
-      
-  
-      const amountToMint = Math.floor(raidAmount * 10 ** DECIMALS);
-      transaction.add(
-        createMintToInstruction(
-          RAID_MINT_ADDRESS,
-          userTokenAccount,
-          mintAuthorityKeypair.publicKey,
-          amountToMint,
-          [],
-          CUSTOM_TOKEN_PROGRAM_ID
-        )
-      );
-  
-      transaction.feePayer = payerKeyPair.publicKey;
-      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-  
-      transaction.sign(mintAuthorityKeypair, payerKeyPair);
-  
-      const simulation = await connection.simulateTransaction(transaction);
-      if (simulation.value.err) {
-        console.error("Simulation failed:", simulation.value.logs);
-        throw new Error("Transaction simulation failed.");
-      }
-  
-      const signature = await connection.sendRawTransaction(transaction.serialize());
-      await connection.confirmTransaction(signature, "processed");
-  
-      console.log(`Transaction Signature: ${signature}`);
-      toast.success(`Transaction confirmed. Signature: ${signature}`);
-    } catch (error) {
-      console.error("Transaction error:", error);
-      toast.error("Failed to mint RAID tokens.");
-    }
-  };
   
   
   
