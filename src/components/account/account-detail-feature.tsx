@@ -373,6 +373,10 @@ async function getMintAuthorityKeypair() {
     throw error;
   }
 }
+
+
+
+
 const claimRewards = async (publicKey: PublicKey) => {
   if (!publicKey) {
     toast.error('Wallet not connected.');

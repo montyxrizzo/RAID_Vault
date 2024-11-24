@@ -31,6 +31,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { toast } from "react-hot-toast";
 import { toast } from "react-toastify";
+import { PieChart } from "react-minimal-pie-chart";
 
 
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
@@ -45,18 +46,16 @@ export default function PresalePage() {
   const [raidAmount, setRaidAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
-  //const DECIMALS = 9; // Number of decimals for RAID token
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const data = [
+    { title: "Presale", value: 30, color: "#4caf50" },
+    { title: "Liquidity", value: 30, color: "#2196f3" },
+    { title: "Staking", value: 20, color: "#FF69B4" },
+    { title: "Development", value: 10, color: "#ff9800" },
+    { title: "Marketing", value: 10, color: "#f44336" },
+  ];
 
 
-  // const formatNumberWithCommas = (num: number): string => {
-  //   return new Intl.NumberFormat('en-US').format(Math.round(num));
-  // };
-  // const formatNumberDecimals = (num: number): string => {
-  //   return new Intl.NumberFormat('en-US', {
-  //     minimumFractionDigits: 2,
-  //     maximumFractionDigits: 2,
-  //   }).format(num);
-  // };
   const formatNumberWithCommasAndDecimals = (num: number): string => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
@@ -133,145 +132,49 @@ export default function PresalePage() {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/presale/progress`);
         const data = response.data;
-    
+
         setProgress(data.progress_percentage || 0);
         setRaidSold(data.total_tokens_sold || 0);
         setSolReceived(data.total_sol_received || 0);
       } catch (error) {
-  //      console.error("Error fetching presale progress:", error);
         toast.error("Failed to load presale progress.");
       }
     };
-    
+
     fetchPresaleProgress();
+
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 60);
+
+    const updateTimeLeft = () => {
+      const now = new Date();
+      const difference = endDate.getTime() - now.getTime();
+
+      if (difference <= 0) {
+        setTimeLeft("Presale ended");
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    const timerId = setInterval(updateTimeLeft, 1000);
+    updateTimeLeft();
+
+    return () => clearInterval(timerId);
   }, []);
+
 
   const handleSolChange = (sol: number) => {
     setSolAmount(sol);
     setRaidAmount(sol * RAID_PER_SOL);
   };
 
-//  const handlePurchase = async () => {
-//     if (solAmount <= 0) {
-//       toast.error("Please enter a valid SOL amount.");
-//       return;
-//     }
-  
-//     if (!publicKey) {
-//       toast.error("Wallet not connected.");
-//       return;
-//     }
-  
-//     setLoading(true);
-  
-//     try {
-//       const PRESALE_WALLET = new PublicKey("H1SkWxyCZ1tAtSQ3xHaPrW5cs4N1EvJhpc7LCNtDN2sB");
-//       const RAID_MINT_ADDRESS = new PublicKey("HNEgW597ZQwZAVL8iEaAc3aKv735pFTspVLqrJESpoth");
-//       const CUSTOM_TOKEN_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
-//       const DECIMALS = 9;
-  
-//       const presaleWalletKeypair = await getPayerKeypair(); // Presale wallet's keypair
-  
-//       // Get user's associated token account for RAID
-//       const userTokenAccount = await getAssociatedTokenAddress(
-//         RAID_MINT_ADDRESS,
-//         publicKey,
-//         false,
-//         CUSTOM_TOKEN_PROGRAM_ID
-//       );
-  
-//       console.log(`User Token Account: ${userTokenAccount.toBase58()}`);
-  
-//       // Get presale wallet's associated token account for RAID
-//       const presaleTokenAccount = await getAssociatedTokenAddress(
-//         RAID_MINT_ADDRESS,
-//         presaleWalletKeypair.publicKey,
-//         false,
-//         CUSTOM_TOKEN_PROGRAM_ID
-//       );
-  
-//       console.log(`Presale Token Account: ${presaleTokenAccount.toBase58()}`);
-  
-//       // Create a transaction
-//       const transaction = new Transaction();
-  
-//       // Add SOL transfer instruction
-//       transaction.add(
-//         SystemProgram.transfer({
-//           fromPubkey: publicKey,
-//           toPubkey: PRESALE_WALLET,
-//           lamports: solAmount * 1e9, // Convert SOL to lamports
-//         })
-//       );
-  
-//       // Check if user's associated token account exists, and create one if necessary
-//       const userAccountExists = await connection.getAccountInfo(userTokenAccount);
-//       if (!userAccountExists) {
-//         transaction.add(
-//           createAssociatedTokenAccountInstruction(
-//             publicKey, // Fee payer
-//             userTokenAccount, // Associated token account
-//             publicKey, // Owner
-//             RAID_MINT_ADDRESS, // Mint
-//             CUSTOM_TOKEN_PROGRAM_ID // Token program ID
-//           )
-//         );
-//       }
-  
-//       // Add RAID token transfer instruction
-//       const raidAmount = solAmount * 100; // Example: 1 SOL = 100 RAID
-//       const amountToTransfer = Math.floor(raidAmount * 10 ** DECIMALS);
-  
-//       transaction.add(
-//         createTransferInstruction(
-//           presaleTokenAccount, // Source (presale wallet's RAID token account)
-//           userTokenAccount, // Destination (user's RAID token account)
-//           presaleWalletKeypair.publicKey, // Owner of source
-//           amountToTransfer,
-//           [],
-//           CUSTOM_TOKEN_PROGRAM_ID
-//         )
-//       );
-  
-//       // Set the fee payer to the user's wallet
-//       transaction.feePayer = publicKey;
-  
-//       // Fetch the latest blockhash
-//       const latestBlockhash = await connection.getLatestBlockhash();
-//       transaction.recentBlockhash = latestBlockhash.blockhash;
-  
-//       // Partially sign the transaction with the presale wallet keypair
-//       transaction.partialSign(presaleWalletKeypair);
-  
-//       // Send the transaction to the user's wallet for signing
-//       const signature = await sendTransaction(transaction, connection);
-//       await connection.confirmTransaction(signature, "processed");
-  
-//       console.log(`Transaction successful: ${signature}`);
-//       toast.success(
-//         <div>
-//           Successfully contributed {solAmount} SOL and received {raidAmount} RAID! 🎉
-//           <br />
-//           <a
-//             href={`https://explorer.solana.com/tx/${signature}?cluster=mainnet-beta`}
-//             target="_blank"
-//             rel="noopener noreferrer"
-//             className="text-indigo-400 underline"
-//           >
-//             View on Solana Explorer
-//           </a>
-//         </div>
-//       );
-  
-//       // Record the contribution to the presale
-//       await contributeToPresale(publicKey.toBase58(), solAmount, signature);
-//     } catch (error) {
-//       console.error("Error during presale transaction:", error);
-//       toast.error("Transaction failed. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 const handlePurchase = async () => {
   if (solAmount <= 0) {
     toast.error("Please enter a valid SOL amount.");
@@ -402,7 +305,11 @@ const handlePurchase = async () => {
          RAID Token Presale 🚀 
          
         </h1>
-                
+           {/* Countdown Timer */}
+           <div className="text-center mb-8">
+          <h2 className="text-lg font-semibold text-indigo-300">Presale Ends In</h2>
+          <p className="text-2xl font-bold text-indigo-400">{timeLeft}</p>
+        </div>        
         <p className="text-center text-gray-300 mb-8">
           Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution! 
         </p>
@@ -470,9 +377,110 @@ const handlePurchase = async () => {
             {loading ? "Processing..." : "Swap SOL for RAID"}
           </button>
         </div>
-        <sub>*Limited time only.</sub>
+{/* Donut Chart */}
+<div className="text-center mb-8">
+  {/* Title */}
+  <h2 className="text-2xl font-bold text-indigo-400 mb-4">RAID Tokenomics</h2>
+
+  {/* Animated Donut Chart */}
+  <div className="flex justify-center relative">
+    <svg width="500" height="500" viewBox="0 0 500 500" className="animate-fade-in">
+      <PieChart
+        data={data}
+        lineWidth={30}
+        radius={30}
+        animate
+        segmentsStyle={{ cursor: "pointer", transition: "stroke 0.3s ease-out" }}
+      />
+      {/* Center Text */}
+      <text
+        x="250"
+        y="250"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        style={{
+          fontSize: "24px",
+          fontWeight: "bold",
+          fill: "#fff",
+        }}
+      >
+        2 Billion Tokens
+      </text>
+      {/* Add animations via CSS */}
+
+{/* Add animations via CSS */}
+<style>
+  {`
+    .animate-fade-in {
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  `}
+</style>
+      {/* Rotated Labels with Callout Lines */}
+      {data.map((entry, index) => {
+        const cumulativeValue = data
+          .slice(0, index)
+          .reduce((sum, d) => sum + d.value, 0);
+        const angle =
+          (cumulativeValue + entry.value / 2) * (360 / 100) + 90; // Adjust rotation for alignment
+        const radians = ((angle - 90) * Math.PI) / 180;
+
+        // Calculate positions for the lines and labels
+        const x1 = 250 + 120 * Math.cos(radians); // Start of the line, closer to the donut
+        const y1 = 250 + 120 * Math.sin(radians);
+        const x2 = 250 + 160 * Math.cos(radians); // End of the line, further out
+        const y2 = 250 + 160 * Math.sin(radians);
+        const xText = 250 + 190 * Math.cos(radians); // Label position
+        const yText = 250 + 190 * Math.sin(radians);
+
+        return (
+          <g key={entry.title}>
+            {/* Callout Line */}
+            <line
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke={entry.color}
+              strokeWidth="1"
+            />
+            {/* Label */}
+            <text
+              x={xText}
+              y={yText}
+              transform={`rotate(${angle}, ${xText}, ${yText})`} // Rotate label for alignment
+              textAnchor={xText > 250 ? "start" : "end"} // Align text based on its position
+              dominantBaseline="middle"
+              style={{
+                fontSize: "12px", // Ensure labels are legible
+                fontWeight: "bold",
+                fill: "#fff",
+              }}
+            >
+              {entry.title}: {entry.value}%
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  </div>
+</div>
+
+
+
+                </div>          
       </div>
    
-    </div>
   );
 }

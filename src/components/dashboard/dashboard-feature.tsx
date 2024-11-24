@@ -5,8 +5,9 @@ import ParticleVisualization from './ParticleVisualization';
 import { Link } from 'react-router-dom';
 
 const links = [
+    { label: 'Presale', to: '/get-raid', className: "text-green-400 font-semibold", isInternal: true },  
 
-    { label: 'Staking', to: '/account', className: "text-green-400 font-semibold", isInternal: true },  
+    { label: 'Staking', to: '/account', className: "text-white-400 font-semibold", isInternal: true },  
       { label: 'R-DAO', href: '/', disable :true },
     { label: 'Compute Client Portal', href: '/', disable :true },
     { label: 'GPU Provider Program', href: 'https://github.com/montyxrizzo/GPU_Provider_Program',rel:"noopener noreferrer",
