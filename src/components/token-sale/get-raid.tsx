@@ -65,37 +65,13 @@ export default function PresalePage() {
   };
   
 
-  async function getMintAuthorityKeypair() {
-    try {
-      // Explicitly define the base URL if needed
-      const response = await axios.get(`${API_BASE_URL}/staking-data/secret`); // Replace with the actual backend URL if necessary
-      console.log('Response:', response);
-  
-      const { key } = response.data;
-  
-      if (!key) {
-        throw new Error('Secret key is not defined in the backend response');
-      }
-  
-      // Parse the key string into a Uint8Array
-      const secretArray = JSON.parse(key);
-      const secretBytes = Uint8Array.from(secretArray);
-  
-      // Create the Keypair from the secret bytes
-      const mintAuthorityKeypair = Keypair.fromSecretKey(secretBytes);
-      return mintAuthorityKeypair;
-    } catch (error) {
-      console.error('Error fetching or processing the secret key:', error);
-      throw error;
-    }
-  }
 
 
   async function getPayerKeypair() {
     try {
       // Explicitly define the base URL if needed
       const response = await axios.get(`${API_BASE_URL}/secrets/payer`); // Replace with the actual backend URL if necessary
-      console.log('Response:', response);
+   //   console.log('Response:', response);
   
       const { key } = response.data;
   
@@ -112,7 +88,7 @@ export default function PresalePage() {
   
       return mintAuthorityKeypair;
     } catch (error) {
-      console.error('Error fetching or processing the secret key:', error);
+ //     console.error('Error fetching or processing the secret key:', error);
       throw error;
     }
   }
@@ -128,7 +104,7 @@ export default function PresalePage() {
         transactionId: transactionId,
       };
   
-      console.log("Payload:", payload); // Debug log
+ //     console.log("Payload:", payload); // Debug log
       const response = await axios.post(
         `${API_BASE_URL}/presale/transaction`,
         payload,
@@ -146,7 +122,7 @@ export default function PresalePage() {
         throw new Error(response.data.detail || "Failed to contribute");
       }
     } catch (error) {
-      console.error("Error contributing to presale:", error);
+  //    console.error("Error contributing to presale:", error);
       throw error;
     }
   };
@@ -162,7 +138,7 @@ export default function PresalePage() {
         setRaidSold(data.total_tokens_sold || 0);
         setSolReceived(data.total_sol_received || 0);
       } catch (error) {
-        console.error("Error fetching presale progress:", error);
+  //      console.error("Error fetching presale progress:", error);
         toast.error("Failed to load presale progress.");
       }
     };
@@ -333,8 +309,8 @@ const handlePurchase = async () => {
       CUSTOM_TOKEN_PROGRAM_ID
     );
 
-    console.log(`Presale Wallet Token Account: ${raidWalletTokenAccount.toBase58()}`);
-    console.log(`User Token Account: ${userTokenAccount.toBase58()}`);
+  //  console.log(`Presale Wallet Token Account: ${raidWalletTokenAccount.toBase58()}`);
+  //  console.log(`User Token Account: ${userTokenAccount.toBase58()}`);
 
     const transaction = new Transaction();
 
