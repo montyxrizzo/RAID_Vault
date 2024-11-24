@@ -17,7 +17,6 @@ import {
   getAssociatedTokenAddress,
 
 
-  createMintToInstruction,
 } from '@solana/spl-token';
 
 //import { useSpring, animated } from '@react-spring/web';
@@ -45,7 +44,7 @@ export default function PresalePage() {
   const [solAmount, setSolAmount] = useState<number>(0);
   const [raidAmount, setRaidAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const { publicKey, sendTransaction, connected } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   //const DECIMALS = 9; // Number of decimals for RAID token
 
 
