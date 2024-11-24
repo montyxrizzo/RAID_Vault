@@ -48,9 +48,10 @@ export default function PresalePage() {
   const { publicKey, sendTransaction } = useWallet();
   const [timeLeft, setTimeLeft] = useState<string>("");
   const data = [
-    { title: "Presale", value: 30, color: "#4caf50" },
-    { title: "Liquidity", value: 30, color: "#2196f3" },
-    { title: "Staking", value: 20, color: "#FF69B4" },
+    { title: "Presale", value: 10, color: "#4caf50" },
+    { title: "Liquidity", value: 40, color: "#2196f3" },
+    { title: "Staking", value: 25, color: "#FF69B4" },
+    { title: "DAO Rewards", value: 5, color: "#A020F0" },
     { title: "Development", value: 10, color: "#ff9800" },
     { title: "Marketing", value: 10, color: "#f44336" },
   ];
@@ -404,7 +405,7 @@ const handlePurchase = async () => {
           fill: "#fff",
         }}
       >
-        2 Billion Tokens
+        1 Billion Tokens
       </text>
       {/* Add animations via CSS */}
 
@@ -476,11 +477,7 @@ const handlePurchase = async () => {
     </svg>
   </div>
 </div>
-
-
-
-                </div>          
-      </div>
-   
-  );
+</div>          
+</div>
+);
 }
