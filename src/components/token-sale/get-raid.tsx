@@ -35,7 +35,7 @@ import { PieChart } from "react-minimal-pie-chart";
 
 
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
-const RAID_PER_SOL = 50000; // Example conversion rate: 1000 RAID per SOL
+const RAID_PER_SOL = 250000; // Example conversion rate: 1000 RAID per SOL
 const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
  
 export default function PresalePage() {
@@ -271,7 +271,7 @@ const handlePurchase = async () => {
     console.log(`Transaction successful: ${signature}`);
     toast.success(
       <div>
-        Successfully swapped {solAmount} SOL for {raidAmount} RAID! 🎉
+        Successfully swapped {formatNumberWithCommasAndDecimals(solAmount)} SOL for {formatNumberWithCommasAndDecimals(raidAmount)} RAID! 🎉
         <br />
         <a
           href={`https://solscan.io/tx/${signature}?cluster=mainnet-beta`}
@@ -362,7 +362,7 @@ const handlePurchase = async () => {
 
             {/* Conversion Rate */}
             <p className="text-center text-sm text-gray-400">
-              1 SOL = {RAID_PER_SOL} RAID
+              1 SOL = {formatNumberWithCommasAndDecimals(RAID_PER_SOL)} RAID
             </p>
           </div>
 
