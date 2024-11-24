@@ -417,7 +417,7 @@ const handlePurchase = async () => {
             ></div>
           </div>
           <div className="flex justify-between mt-2 text-gray-300 text-sm">
-            <span>{progress}% Complete</span>
+            <span>{formatNumberWithCommasAndDecimals(progress)}% Complete</span>
             <span>RAID Sold:{formatNumberWithCommasAndDecimals(raidSold)}</span>
           </div>
           <div className="text-right text-gray-300 text-sm">
