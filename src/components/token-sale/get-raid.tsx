@@ -34,7 +34,7 @@ import { toast } from "react-toastify";
 
 
 const API_BASE_URL = 'https://mcnv3hcykt.us-east-2.awsapprunner.com'; // Replace with your backend URL
-const RAID_PER_SOL = 1000; // Example conversion rate: 1000 RAID per SOL
+const RAID_PER_SOL = 50000; // Example conversion rate: 1000 RAID per SOL
 const connection = new Connection('https://prettiest-flashy-wind.solana-mainnet.quiknode.pro/45fee519abbd5d4cac5f5c12044119d868ae84cb/', 'processed');
  
 export default function PresalePage() {
