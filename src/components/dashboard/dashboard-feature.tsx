@@ -37,7 +37,7 @@ export default function DashboardFeature() {
                             </h1>
                         }
                         subtitle={
-                            <p className="text-xl md:text-2xl lg:text-3xl font-semibold text-indigo-200 mt-4 max-w-2xl mx-auto leading-snug">
+                            <p className="text-xl md:text-2xl lg:text-3xl font-semibold text-white-200 mt-4 max-w-2xl mx-auto leading-snug">
                                 Powering AI with Distributed Efficiency—Rewarding You, Lowering Costs, Driving Innovation
                                 
                             </p>
