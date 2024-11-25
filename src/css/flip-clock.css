@@ -1,0 +1,26 @@
+.flip-clock-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    text-align: center;
+  }
+  
+  .flip-clock-label {
+    font-size: 14px;
+    color: #bbb;
+    margin-bottom: 5px;
+  }
+  
+  .flip-clock-digit {
+    font-size: 48px;
+    font-weight: bold;
+    background: #333;
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    min-width: 60px;
+    text-align: center;
+  }
+  

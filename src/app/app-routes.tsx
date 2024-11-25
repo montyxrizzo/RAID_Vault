@@ -13,7 +13,7 @@ const RoadmapFeature = lazy(() => import('../components/dashboard/roadmap'));
 const TermsPage = lazy(() => import('../components/docs/terms')); // Add this line
 const PrivacyPage = lazy(() => import('../components/docs/privacy')); // Add this line
 const links: { label: string; path: string }[] = [
-  { label: 'Get Raid', path: '/get-raid' },
+  { label: 'ICO', path: '/get-raid' },
   { label: 'Staking', path: '/account' },
   { label: 'Roadmap', path: '/roadmap' }, // Add roadmap link
   { label: 'Whitepaper', path: '/whitepaper' }, // Add link to Whitepaper

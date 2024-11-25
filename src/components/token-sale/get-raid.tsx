@@ -1,3 +1,4 @@
+
 import {
   Connection,
   PublicKey,
@@ -7,6 +8,7 @@ SystemProgram,
   Keypair,
   //sendAndConfirmTransaction
 } from '@solana/web3.js';
+import "/src/css/flip-clock.css"; // Custom CSS for styling
 
 import {
   //getOrCreateAssociatedTokenAccount,
@@ -20,7 +22,6 @@ import {
 } from '@solana/spl-token';
 
 //import { useSpring, animated } from '@react-spring/web';
-
 
 
 
@@ -45,7 +46,14 @@ export default function PresalePage() {
   const [raidAmount, setRaidAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
-  const [timeLeft, setTimeLeft] = useState<string>("");
+   // Explicitly type the state as TimeLeft
+   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
+  });
+
   const data = [
     { title: "Presale", value: 10, color: "#4caf50" },
     { title: "Liquidity", value: 40, color: "#2196f3" },
@@ -54,7 +62,14 @@ export default function PresalePage() {
     { title: "Development", value: 10, color: "#ff9800" },
     { title: "Marketing", value: 10, color: "#f44336" },
   ];
-
+// Define the type for the timeLeft state
+// Define the shape of the timeLeft state
+interface TimeLeft {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
 
   const formatNumberWithCommasAndDecimals = (num: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -142,16 +157,16 @@ export default function PresalePage() {
     };
 
     fetchPresaleProgress();
-
+ // Import FlipClock JavaScript dynamically
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 60);
+    endDate.setDate(endDate.getDate() + 60); // Example: 60-day countdown
 
     const updateTimeLeft = () => {
       const now = new Date();
       const difference = endDate.getTime() - now.getTime();
 
       if (difference <= 0) {
-        setTimeLeft("Presale ended");
+        setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
         return;
       }
 
@@ -160,16 +175,20 @@ export default function PresalePage() {
       const minutes = Math.floor((difference / 1000 / 60) % 60);
       const seconds = Math.floor((difference / 1000) % 60);
 
-      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+      setTimeLeft({
+        days: days.toString().padStart(2, "0"),
+        hours: hours.toString().padStart(2, "0"),
+        minutes: minutes.toString().padStart(2, "0"),
+        seconds: seconds.toString().padStart(2, "0"),
+      });
     };
 
+    // Update the timer every second
     const timerId = setInterval(updateTimeLeft, 1000);
     updateTimeLeft();
 
-    return () => clearInterval(timerId);
+    return () => clearInterval(timerId); // Clean up the timer on component unmount
   }, []);
-
-
   const handleSolChange = (sol: number) => {
     setSolAmount(sol);
     setRaidAmount(sol * RAID_PER_SOL);
@@ -309,14 +328,14 @@ return (
 
     <div className="relative max-w-3xl mx-auto px-6 z-10">
       {/* Title */}
-      <h1
+      {/* <h1
   className="text-5xl font-extrabold text-center mb-8 relative"
   style={{
     fontFamily: "'Poppins', sans-serif", // Modern font
     color: '#6C63FF', // Purple for "RAID"
-  }}
->
-  <span style={{ color: '#6C63FF' }}>R</span>
+  }} */}
+{/* > */}
+  {/* <span style={{ color: '#6C63FF' }}>R</span>
   <span 
     style={{
       color: '#ffffff', // White for "AI"
@@ -327,7 +346,12 @@ return (
   >
     AI
   </span>
-  <span style={{ color: '#6C63FF' }}>D Presale is now </span>
+  <span style={{ color: '#6C63FF' }}>D */}
+    <h1 className="text-5xl font-extrabold text-center mb-8 relative"
+  style={{
+    fontFamily: "'Poppins', sans-serif", // Modern font
+    color: '#6C63FF', // Purple for "RAID"
+  }}><span>I.C.O is </span>
   <span
     className="animate-pulse"
     style={{
@@ -339,29 +363,17 @@ return (
   </span>🚀
 </h1>
 
+<center><h2 className="text-xl font-semibold text-red-300 mb-4"> Ends In</h2></center>
 
-
-
-      {/* Countdown Timer */}
-      <div className="text-center mb-12">
-        <h2 className="text-xl font-semibold text-red-300">Presale Ends In</h2>
-        <div className="flex justify-center space-x-4 mt-4">
-          {["Days", "Hours", "Minutes", "Seconds"].map((label, index) => (
-            <div key={label} className="text-center">
-              <div
-                className="bg-gray-900 text-white-400 font-extrabold text-3xl px-4 py-2 rounded-lg shadow-md"
-                style={{ width: "80px" }}
-              >
-                {timeLeft.split(" ")[index]?.replace(/[a-z]/gi, "") || "0"}
-              </div>
-              <span className="text-sm font-semibold text-gray-400 mt-2 block">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
+      <div className="flex justify-center space-x-4">
+        
+        {Object.entries(timeLeft).map(([unit, value]) => (
+          <div key={unit} className="flip-clock-unit">
+            <div className="flip-clock-label capitalize">{unit}</div>
+            <div className="flip-clock-digit">{value}</div>
+          </div>
+        ))}
       </div>
-
       {/* Description */}
       <p className="text-center text-gray-300 mb-8 text-lg">
         Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution!
@@ -370,7 +382,7 @@ return (
       {/* Presale Progress */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-indigo-300 mb-4">
-          Presale Progress
+          Goal Progress
         </h2>
         <div className="relative w-full bg-gray-700 h-6 rounded-lg overflow-hidden">
           <div
@@ -544,12 +556,13 @@ return (
     details:
   </p>
   <ul className="list-disc list-inside text-left mx-auto max-w-md">
+    <li><span className="font-semibold">I.C.O Price will periodically increase until release.</span> </li>
     <li><span className="font-semibold">Total Token Supply:</span> 1 Billion RAID</li>
     <li><span className="font-semibold">Presale Allocation:</span> 10% (100 Million RAID)</li>
     <li><span className="font-semibold">Presale Price:</span> 1 SOL = 250,000 RAID</li>
     <li><span className="font-semibold">Liquidity Allocation:</span> 40% of total tokens</li>
     <li><span className="font-semibold">Staking Allocation:</span> 25% reserved for staking rewards</li>
-    <li><span className="font-semibold">Presale End Date:</span> {new Date().toLocaleDateString()}</li>
+    <li><span className="font-semibold">Presale End Date:</span>  1/25/25</li>
   </ul>
   <p className="mt-4">
     Join the community today and secure your place in the future of GPU-driven decentralization.

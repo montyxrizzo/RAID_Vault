@@ -23,7 +23,6 @@ import {
 
   createMintToInstruction,
 } from '@solana/spl-token';
-
 import { useSpring, animated } from '@react-spring/web';
 
 
@@ -523,6 +522,8 @@ useEffect(() => {
  return (
   <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
     <ToastContainer />
+          {/* Circuit Board Background */}
+      {/* <CircuitBoardBackground /> */}
 
     {/* Header Section */}
     <div className="max-w-3xl w-full text-center mb-8">

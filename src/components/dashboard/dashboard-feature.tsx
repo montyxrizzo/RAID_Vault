@@ -5,7 +5,7 @@ import ParticleVisualization from './ParticleVisualization';
 import { Link } from 'react-router-dom';
 
 const links = [
-    { label: 'Presale', to: '/get-raid', className: "text-green-400 font-semibold", isInternal: true },  
+    // { label: 'Presale', to: '/get-raid', className: "text-green-400 font-semibold", isInternal: true },  
 
     { label: 'Staking', to: '/account', className: "text-white-400 font-semibold", isInternal: true },  
       { label: 'R-DAO', href: '/', disable :true },
@@ -18,6 +18,7 @@ const links = [
 
 export default function DashboardFeature() {
     return (
+        
         <div className="bg-gradient-to-b from-purple-900 to-indigo-900 text-white min-h-screen relative overflow-hidden">
             {/* Hero section with particle background */}
             <div className="relative flex justify-center items-center h-96">
@@ -41,6 +42,20 @@ export default function DashboardFeature() {
                             </p>
                         }
                     />
+                           <div className="mt-6 text-center">
+                    <Link
+                        to="/get-raid"
+                        className="text-red-500 text-3xl font-bold animate-pulse"
+                        style={{
+                            textDecoration: 'none',
+                        }}
+                    >
+                        INITIAL COIN OFFERING LIVE NOW!
+                    </Link>
+                </div>
+                    <br></br>
+                      {/* Flashing Presale Link */}
+         
                 </div>
             </div>
 
