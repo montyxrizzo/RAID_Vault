@@ -26,7 +26,6 @@ import {
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { toast } from "react-hot-toast";
@@ -296,188 +295,269 @@ const handlePurchase = async () => {
   
   
   
-  
-  return (
-    <div className="bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen py-16">
-       <ToastContainer />
+return (
+  <div
+    className="relative bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white min-h-screen py-16"
+    style={{
+      backgroundImage: "url('/raid_alt.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >
+    {/* Semi-transparent overlay for readability */}
+    <div className="absolute inset-0 bg-black bg-opacity-75"></div>
 
-      <div className="max-w-2xl mx-auto px-6">
-        <h1 className="text-3xl font-bold text-center text-indigo-400 mb-8">
-         RAID Token Presale 🚀 
-         
-        </h1>
-           {/* Countdown Timer */}
-           <div className="text-center mb-8">
-          <h2 className="text-lg font-semibold text-indigo-300">Presale Ends In</h2>
-          <p className="text-2xl font-bold text-indigo-400">{timeLeft}</p>
-        </div>        
-        <p className="text-center text-gray-300 mb-8">
-          Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution! 
-        </p>
-        
-        {/* Presale Progress */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-indigo-300 mb-4">Presale Progress</h2>
-          <div className="relative w-full bg-gray-700 h-6 rounded-lg overflow-hidden">
-            <div
-              className="absolute top-0 left-0 h-full bg-green-500"
-              style={{ width: `${formatNumberWithCommasAndDecimals(progress)}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between mt-2 text-gray-300 text-sm">
-            <span>{formatNumberWithCommasAndDecimals(progress)}% Complete</span>
-            <span>RAID Sold:{formatNumberWithCommasAndDecimals(raidSold)}</span>
-          </div>
-          <div className="text-right text-gray-300 text-sm">
-            SOL Received: {formatNumberWithCommasAndDecimals(solReceived)}
-          </div>
-        </div>
+    <div className="relative max-w-3xl mx-auto px-6 z-10">
+      {/* Title */}
+      <h1
+  className="text-5xl font-extrabold text-center mb-8 relative"
+  style={{
+    fontFamily: "'Poppins', sans-serif", // Modern font
+    color: '#6C63FF', // Purple for "RAID"
+  }}
+>
+  <span style={{ color: '#6C63FF' }}>R</span>
+  <span 
+    style={{
+      color: '#ffffff', // White for "AI"
+      background: 'linear-gradient(90deg, #6C63FF, #ffffff)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+    }}
+  >
+    AI
+  </span>
+  <span style={{ color: '#6C63FF' }}>D Presale is now </span>
+  <span
+    className="animate-pulse"
+    style={{
+      color: '#FF0000', // Red for "LIVE"
+      fontWeight: 'bold',
+    }}
+  >
+    LIVE!
+  </span>🚀
+</h1>
 
-        {/* Swap Box */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md w-full">
-          <h3 className="text-lg font-semibold text-indigo-300 mb-4 text-center">Swap SOL for RAID</h3>
-          <div className="flex flex-col gap-4">
-            {/* SOL Input */}
-            <div className="flex items-center gap-4">
-              <img src="/solana.jpg" alt="SOL" className="w-10 h-10" />
-              <input
-                type="number"
-                value={solAmount}
-                onChange={(e) => handleSolChange(Number(e.target.value))}
-                placeholder="Enter SOL amount"
-                className="flex-grow px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+
+
+
+      {/* Countdown Timer */}
+      <div className="text-center mb-12">
+        <h2 className="text-xl font-semibold text-red-300">Presale Ends In</h2>
+        <div className="flex justify-center space-x-4 mt-4">
+          {["Days", "Hours", "Minutes", "Seconds"].map((label, index) => (
+            <div key={label} className="text-center">
+              <div
+                className="bg-gray-900 text-white-400 font-extrabold text-3xl px-4 py-2 rounded-lg shadow-md"
+                style={{ width: "80px" }}
+              >
+                {timeLeft.split(" ")[index]?.replace(/[a-z]/gi, "") || "0"}
+              </div>
+              <span className="text-sm font-semibold text-gray-400 mt-2 block">
+                {label}
+              </span>
             </div>
-
-            {/* RAID Output */}
-            <div className="flex items-center gap-4">
-              <img src="/raid_token_close.png" alt="RAID" className="w-10 h-10" />
-              <input
-                type="text"
-                value={raidAmount}
-                readOnly
-                className="flex-grow px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white"
-              />
-            </div>
-
-            {/* Conversion Rate */}
-            <p className="text-center text-sm text-gray-400">
-              1 SOL = {formatNumberWithCommasAndDecimals(RAID_PER_SOL)} RAID
-            </p>
-          </div>
-
-          <button
-            onClick={handlePurchase}
-            disabled={loading}
-            className={`mt-4 w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-indigo-500 hover:bg-indigo-600"
-            }`}
-          >
-            {loading ? "Processing..." : "Swap SOL for RAID"}
-          </button>
+          ))}
         </div>
-{/* Donut Chart */}
-<div className="text-center mb-8">
-  {/* Title */}
-  <h2 className="text-2xl font-bold text-indigo-400 mb-4">RAID Tokenomics</h2>
+      </div>
 
-  {/* Animated Donut Chart */}
-  <div className="flex justify-center relative">
-    <svg width="500" height="500" viewBox="0 0 500 500" className="animate-fade-in">
-      <PieChart
-        data={data}
-        lineWidth={30}
-        radius={30}
-        animate
-        segmentsStyle={{ cursor: "pointer", transition: "stroke 0.3s ease-out" }}
-      />
-      {/* Center Text */}
-      <text
-        x="250"
-        y="250"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        style={{
-          fontSize: "24px",
-          fontWeight: "bold",
-          fill: "#fff",
-        }}
-      >
-        1 Billion Tokens
-      </text>
-      {/* Add animations via CSS */}
+      {/* Description */}
+      <p className="text-center text-gray-300 mb-8 text-lg">
+        Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution!
+      </p>
 
-{/* Add animations via CSS */}
-<style>
-  {`
-    .animate-fade-in {
-      animation: fadeIn 3s ease-in-out;
-    }
+      {/* Presale Progress */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-indigo-300 mb-4">
+          Presale Progress
+        </h2>
+        <div className="relative w-full bg-gray-700 h-6 rounded-lg overflow-hidden">
+          <div
+            className="absolute top-0 left-0 h-full bg-green-500"
+            style={{
+              width: `${formatNumberWithCommasAndDecimals(progress)}%`,
+            }}
+          ></div>
+        </div>
+        <div className="flex justify-between mt-2 text-gray-300 text-sm">
+          <span>{formatNumberWithCommasAndDecimals(progress)}% Complete</span>
+          <span>RAID Sold: {formatNumberWithCommasAndDecimals(raidSold)}</span>
+        </div>
+        <div className="text-right text-gray-300 text-sm">
+          SOL Received: {formatNumberWithCommasAndDecimals(solReceived)}
+        </div>
+      </div>
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-  `}
-</style>
-      {/* Rotated Labels with Callout Lines */}
-      {data.map((entry, index) => {
-        const cumulativeValue = data
-          .slice(0, index)
-          .reduce((sum, d) => sum + d.value, 0);
-        const angle =
-          (cumulativeValue + entry.value / 2) * (360 / 100) + 90; // Adjust rotation for alignment
-        const radians = ((angle - 90) * Math.PI) / 180;
-
-        // Calculate positions for the lines and labels
-        const x1 = 250 + 120 * Math.cos(radians); // Start of the line, closer to the donut
-        const y1 = 250 + 120 * Math.sin(radians);
-        const x2 = 250 + 160 * Math.cos(radians); // End of the line, further out
-        const y2 = 250 + 160 * Math.sin(radians);
-        const xText = 250 + 190 * Math.cos(radians); // Label position
-        const yText = 250 + 190 * Math.sin(radians);
-
-        return (
-          <g key={entry.title}>
-            {/* Callout Line */}
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke={entry.color}
-              strokeWidth="1"
+      {/* Swap Box */}
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg bg-opacity-85">
+        <h3 className="text-lg font-semibold text-white-300 mb-4 text-center">
+          Swap SOL for RAID
+        </h3>
+        <div className="flex flex-col gap-6">
+          {/* SOL Input */}
+          <div className="flex items-center gap-4">
+            <img src="/solana.jpg" alt="SOL" className="w-10 h-10" />
+            <input
+              type="number"
+              value={solAmount}
+              onChange={(e) => handleSolChange(Number(e.target.value))}
+              placeholder="Enter SOL amount"
+              className="flex-grow px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            {/* Label */}
+          </div>
+
+          {/* RAID Output */}
+          <div className="flex items-center gap-4">
+            <img src="/raid_token_close.png" alt="RAID" className="w-10 h-10" />
+            <input
+              type="text"
+              value={raidAmount}
+              readOnly
+              className="flex-grow px-4 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white"
+            />
+          </div>
+
+          {/* Conversion Rate */}
+          <p className="text-center text-sm text-gray-400">
+            1 SOL = {formatNumberWithCommasAndDecimals(RAID_PER_SOL)} RAID
+          </p>
+        </div>
+
+        <button
+          onClick={handlePurchase}
+          disabled={loading}
+          className={`mt-4 w-full py-2 px-4 rounded-lg font-semibold text-white transition ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-indigo-500 hover:bg-indigo-600"
+          }`}
+        >
+          {loading ? "Processing..." : "Swap SOL for RAID"}
+        </button>
+      </div>
+
+   {/* Donut Chart */}
+   <br></br>
+   <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-indigo-400 mb-4">RAID Tokenomics</h2>
+
+        <div className="flex justify-center relative">
+          <svg width="500" height="500" viewBox="0 0 500 500" className="animate-fade-in">
+            <PieChart
+              data={data}
+              lineWidth={30}
+              radius={30}
+              animate
+              segmentsStyle={{ cursor: "pointer", transition: "stroke 0.3s ease-out" }}
+            />
+            {/* Center Text */}
             <text
-              x={xText}
-              y={yText}
-              transform={`rotate(${angle}, ${xText}, ${yText})`} // Rotate label for alignment
-              textAnchor={xText > 250 ? "start" : "end"} // Align text based on its position
+              x="250"
+              y="250"
+              textAnchor="middle"
               dominantBaseline="middle"
               style={{
-                fontSize: "12px", // Ensure labels are legible
+                fontSize: "24px",
                 fontWeight: "bold",
                 fill: "#fff",
               }}
             >
-              {entry.title}: {entry.value}%
+              1 Billion Tokens
             </text>
-          </g>
-        );
-      })}
-    </svg>
+
+            <style>
+              {`
+                .animate-fade-in {
+                  animation: fadeIn 5s ease-in-out;
+                }
+
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                    transform: scale(0.8);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: scale(1);
+                  }
+                }
+              `}
+            </style>
+
+            {/* Rotated Labels with Callout Lines */}
+            {data.map((entry, index) => {
+              const cumulativeValue = data
+                .slice(0, index)
+                .reduce((sum, d) => sum + d.value, 0);
+              const angle =
+                (cumulativeValue + entry.value / 2) * (360 / 100) + 90; // Adjust rotation for alignment
+              const radians = ((angle - 90) * Math.PI) / 180;
+
+              // Calculate positions for the lines and labels
+              const x1 = 250 + 120 * Math.cos(radians); // Start of the line, closer to the donut
+              const y1 = 250 + 120 * Math.sin(radians);
+              const x2 = 250 + 160 * Math.cos(radians); // End of the line, further out
+              const y2 = 250 + 160 * Math.sin(radians);
+              const xText = 250 + 190 * Math.cos(radians); // Label position
+              const yText = 250 + 190 * Math.sin(radians);
+
+              return (
+                <g key={entry.title}>
+                  {/* Callout Line */}
+                  <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke={entry.color}
+                    strokeWidth="1"
+                  />
+                  {/* Label */}
+                  <text
+                    x={xText}
+                    y={yText}
+                    transform={`rotate(${angle}, ${xText}, ${yText})`} // Rotate label for alignment
+                    textAnchor={xText > 250 ? "start" : "end"} // Align text based on its position
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      fill: "#fff",
+                    }}
+                  >
+                    {entry.title}: {entry.value}%
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+
+{/* Presale Info */}
+<div className="text-center text-gray-300 mb-8">
+  <h3 className="text-xl font-bold text-indigo-300 mb-4">Additional Information</h3>
+  <p className="mb-4">
+    The RAID Token Presale is your opportunity to join the decentralized GPU
+    revolution. Here’s how the tokens are distributed and the key presale
+    details:
+  </p>
+  <ul className="list-disc list-inside text-left mx-auto max-w-md">
+    <li><span className="font-semibold">Total Token Supply:</span> 1 Billion RAID</li>
+    <li><span className="font-semibold">Presale Allocation:</span> 10% (100 Million RAID)</li>
+    <li><span className="font-semibold">Presale Price:</span> 1 SOL = 250,000 RAID</li>
+    <li><span className="font-semibold">Liquidity Allocation:</span> 40% of total tokens</li>
+    <li><span className="font-semibold">Staking Allocation:</span> 25% reserved for staking rewards</li>
+    <li><span className="font-semibold">Presale End Date:</span> {new Date().toLocaleDateString()}</li>
+  </ul>
+  <p className="mt-4">
+    Join the community today and secure your place in the future of GPU-driven decentralization.
+  </p>
+</div>
+    </div>
   </div>
-</div>
-</div>          
-</div>
 );
+
+
 }
