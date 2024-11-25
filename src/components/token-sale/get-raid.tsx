@@ -336,7 +336,7 @@ return (
   >
         <ToastContainer />
     {/* Semi-transparent overlay for readability */}
-    <div className="absolute inset-0 bg-black bg-opacity-55"></div>
+    <div className="absolute inset-0 bg-black bg-opacity-25"></div>
 
     <div className="relative max-w-3xl mx-auto px-6 z-10">
       {/* Title */}
