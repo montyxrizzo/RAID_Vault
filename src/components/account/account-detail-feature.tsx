@@ -550,8 +550,8 @@ useEffect(() => {
     </div>
 
     {/* TVL Dashboard */}
-    <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6 bg-opacity-90">
-      <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
+    <div className="max-w-xl w-full bg-cyan-900 shadow-lg rounded-lg p-6 mb-6 bg-opacity-90">
+      <h2 className="text-3xl font-bold text-grey-600 mb-4 text-center">
         Vault Metrics
       </h2>
       <p className="text-gray-300 text-center text-lg">
@@ -566,7 +566,7 @@ useEffect(() => {
         Total Value Locked (TVL):
       </p>
       <div className="flex justify-center mt-4">
-        <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg bg-opacity-85">
+        <div className="bg-gray-900 text-green-600 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg bg-opacity-85">
           <animated.div>
             {animatedTvl.number.to((val: number) =>
               `$${formatNumberWithCommasAndDecimals(val)}`
