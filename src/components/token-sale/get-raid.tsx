@@ -363,7 +363,7 @@ return (
   style={{
     fontFamily: "'Poppins', sans-serif", // Modern font
     color: '#6C63FF', // Purple for "RAID"
-  }}><span>I.C.O is </span>
+  }}><span>Presale is </span>
   <span
     className="animate-pulse"
     style={{
@@ -378,7 +378,7 @@ return (
 <center><h2 className="text-xl font-semibold text-red-300 mb-4"></h2></center>
 
 <div className="text-center">
-      <h2 className="text-xl font-semibold text-red-300 mb-4">Sale Ends in...</h2>
+      <h2 className="text-xl font-semibold text-red-300 mb-4">Ends in...</h2>
       {countdown.status === "expired" ? (
         <p>{countdown.message}</p>
       ) : (
