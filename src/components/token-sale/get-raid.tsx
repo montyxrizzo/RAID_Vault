@@ -402,7 +402,7 @@ return (
 <center><h2 className="text-xl font-semibold text-red-300 mb-4"></h2></center>
 
 <div className="text-center">
-      <h2 className="text-xl font-semibold text-red-300 mb-4">Presale Ends In</h2>
+      <h2 className="text-xl font-semibold text-red-300 mb-4">Sale Ends In</h2>
       {countdown.status === "expired" ? (
         <p>{countdown.message}</p>
       ) : (
