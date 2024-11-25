@@ -327,16 +327,16 @@ const handlePurchase = async () => {
 return (
   
   <div
-    className="relative bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white min-h-screen py-16"
+    className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16"
     style={{
-      backgroundImage: "url('/raid_alt.png')",
-      backgroundSize: "cover",
+      backgroundImage: "url('build/presale_bg.jpeg')",
+      backgroundSize: "100% auto",
       backgroundPosition: "center",
     }}
   >
         <ToastContainer />
     {/* Semi-transparent overlay for readability */}
-    <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+    <div className="absolute inset-0 bg-black bg-opacity-55"></div>
 
     <div className="relative max-w-3xl mx-auto px-6 z-10">
       {/* Title */}
