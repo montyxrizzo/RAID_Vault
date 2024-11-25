@@ -78,13 +78,7 @@ export default function PresalePage() {
     { title: "Marketing", value: 10, color: "#f44336" },
   ];
 // Define the type for the timeLeft state
-// Define the shape of the timeLeft state
-interface TimeLeft {
-  days: string;
-  hours: string;
-  minutes: string;
-  seconds: string;
-}
+
 
   const formatNumberWithCommasAndDecimals = (num: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -189,34 +183,11 @@ interface TimeLeft {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 60); // Example: 60-day countdown
   
-    const updateTimeLeft = () => {
-      const now = new Date();
-      const difference = endDate.getTime() - now.getTime();
-  
-      // if (difference <= 0) {
-      //   setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
-      //   return;
-      // }
-  
-      // const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      // const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      // const minutes = Math.floor((difference / (1000 / 60)) % 60);
-      // const seconds = Math.floor((difference / 1000) % 60);
-  
-      // setTimeLeft({
-      //   days: days.toString().padStart(2, "0"),
-      //   hours: hours.toString().padStart(2, "0"),
-      //   minutes: minutes.toString().padStart(2, "0"),
-      //   seconds: seconds.toString().padStart(2, "0"),
-      // });
-    };
-  
-    const timerId = setInterval(updateTimeLeft, 1000);
-    updateTimeLeft();
+
   
     // Cleanup function to clear intervals
     return () => {
-      clearInterval(timerId);
+
       clearInterval(countdownInterval);
     };
   }, []);
