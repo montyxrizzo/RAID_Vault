@@ -30,7 +30,7 @@ import { useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 // import { toast } from "react-hot-toast";
-import { toast } from "react-toastify";
+import { toast,ToastContainer } from "react-toastify";
 import { PieChart } from "react-minimal-pie-chart";
 
 
@@ -294,9 +294,12 @@ const handlePurchase = async () => {
     await connection.confirmTransaction(signature, "processed");
 
     console.log(`Transaction successful: ${signature}`);
+  
     toast.success(
       <div>
-        Successfully swapped {formatNumberWithCommasAndDecimals(solAmount)} SOL for {formatNumberWithCommasAndDecimals(raidAmount)} RAID! 🎉
+        <strong>Transaction Successful!</strong>
+        <br />
+        You swapped {formatNumberWithCommasAndDecimals(solAmount)} SOL for {formatNumberWithCommasAndDecimals(raidAmount)} RAID tokens.
         <br />
         <a
           href={`https://solscan.io/tx/${signature}?cluster=mainnet-beta`}
@@ -322,6 +325,7 @@ const handlePurchase = async () => {
   
   
 return (
+  
   <div
     className="relative bg-gradient-to-b from-gray-900 via-black to-gray-800 text-white min-h-screen py-16"
     style={{
@@ -330,6 +334,7 @@ return (
       backgroundPosition: "center",
     }}
   >
+        <ToastContainer />
     {/* Semi-transparent overlay for readability */}
     <div className="absolute inset-0 bg-black bg-opacity-75"></div>
 
