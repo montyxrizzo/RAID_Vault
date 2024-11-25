@@ -329,11 +329,11 @@ return (
   <div
     className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16"
     style={{
-      backgroundImage: "url('src/presale_bg.png')",
+      backgroundImage: "url('/presale_bg.png')",
       backgroundSize: "100% auto",
       backgroundPosition: "center",
     }}
-    
+
   >
         <ToastContainer />
     {/* Semi-transparent overlay for readability */}
