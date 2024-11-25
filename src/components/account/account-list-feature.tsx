@@ -142,12 +142,20 @@ const fetchTotalSolInPool = async () => {
 
   return (
     // <div className="hero py-[64px]">
-    <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
-      {/* <div className="hero-content text-center"> */}
+    <div
+    className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16  flex flex-col items-center  bg-opacity-85 "
+    style={{
+      backgroundImage: "url('/bg2.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >      {/* <div className="hero-content text-center"> */}
         
           <ToastContainer />
 
           {/* Header Section */}
+          <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6  bg-opacity-85">
+
           <div className="max-w-3xl w-full text-center mb-8">
             <h1 className="text-4xl font-bold text-teal-400 mb-4">
               Earn <span className="text-white">RAID</span> by Staking! 🚀
@@ -160,9 +168,10 @@ const fetchTotalSolInPool = async () => {
               the futures of both AI & Crypto.
             </p>
           </div>
+          </div>
 
           {/* TVL Dashboard */}
-          <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
+          <div className="max-w-xl w-full bg-indigo-900 shadow-lg rounded-lg p-6 mb-6  bg-opacity-85">
             <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
               Vault Metrics
             </h2>
@@ -174,7 +183,7 @@ const fetchTotalSolInPool = async () => {
               <strong>SOL Price:</strong>{" "}
               <span className="text-white">${formatNumberDecimals(solPrice)} USD</span>
             </p>
-            <p className="text-center text-2xl font-bold text-teal-300 mt-6">
+            <p className="text-center text-2xl font-bold text-white-300 mt-6">
               Total Value Locked (TVL):
             </p>
             <div className="flex justify-center mt-4">
@@ -187,21 +196,24 @@ const fetchTotalSolInPool = async () => {
               </div>
               
             </div>
-          </div>
-          <div className="text-center mt-6">
-          <span className="text-gray-400 text-lg font-medium">
+            <div className="text-center mt-6">
+          <span className="text-white-400 text-2xl font-medium">
             You could be earning up to
             <span className="text-[#9945FF] font-bold"> {formatNumberWithCommas(apy * 100)}% </span> 
             APY right now...
           </span>
-        </div>
+          
         <br></br>
-          <p className="text-white text-sm">
-            Select your <span className="text-[#9945FF]">Solana</span> wallet to continue!
-          </p>
+        
+        <p className="text-white text-sm">
+          Select your <span className="text-[#9945FF]">Solana</span> wallet to continue!
+        </p>
 
-            <br></br>
-          <WalletButton />
+          <br></br>
+        <WalletButton />
+        </div>
+          </div>
+ 
 
         </div>
       // </div>

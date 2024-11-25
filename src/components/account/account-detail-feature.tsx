@@ -525,7 +525,7 @@ useEffect(() => {
   <div
   className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16  flex flex-col items-center  "
   style={{
-    backgroundImage: "url('/raid_alt.png')",
+    backgroundImage: "url('/bg2.png')",
     backgroundSize: "cover",
     backgroundPosition: "center",
   }}

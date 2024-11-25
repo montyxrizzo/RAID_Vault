@@ -8,7 +8,7 @@ const links = [
     // { label: 'Presale', to: '/get-raid', className: "text-green-400 font-semibold", isInternal: true },  
 
     { label: 'Staking', to: '/account', className: "text-white-400 font-semibold", isInternal: true },  
-      { label: 'R-DAO', href: '/', disable :true },
+    { label: 'R-DAO', href: '/', disable :true },
     { label: 'Compute Client Portal', href: '/', disable :true },
     { label: 'GPU Provider Program', href: 'https://github.com/montyxrizzo/GPU_Provider_Program',rel:"noopener noreferrer",
         className:"text-green-400 font-semibold",  disable :true },
@@ -47,16 +47,16 @@ export default function DashboardFeature() {
                         
                     />
                   <center>  <Link
-  to="/get-raid"
-  className="text-white bg-red-600 text-1xl font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-red-600 focus:outline-none focus:ring-3 focus:ring-red-1300 transition duration-1200"
-  style={{
-    textDecoration: 'none',
-    display: 'inline-block',
-    textAlign: 'center',
-  }}
->
-  INITIAL COIN OFFERING LIVE NOW!
-</Link></center>
+                                to="/get-raid"
+                                className="text-white bg-red-600 text-1xl font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-red-600 focus:outline-none focus:ring-3 focus:ring-red-1300 transition duration-1200"
+                                style={{
+                                    textDecoration: 'none',
+                                    display: 'inline-block',
+                                    textAlign: 'center',
+                                }}
+                                >
+                                INITIAL COIN OFFERING LIVE NOW!
+                                </Link></center>
                     
                            <div className="mt-6 text-center">
                 
