@@ -46,7 +46,22 @@ export default function PresalePage() {
   const [raidAmount, setRaidAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const { publicKey, sendTransaction } = useWallet();
+  const [countdown, setCountdown] = useState<CountdownData | null>(null);
+
    // Explicitly type the state as TimeLeft
+
+
+   interface CountdownData {
+    status: string;
+    message: string;
+    remaining_time: {
+      days: number;
+      hours: number;
+      minutes: number;
+      seconds: number;
+    };
+  }
+  
    const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: "00",
     hours: "00",
@@ -147,7 +162,7 @@ interface TimeLeft {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/presale/progress`);
         const data = response.data;
-
+  
         setProgress(data.progress_percentage || 0);
         setRaidSold(data.total_tokens_sold || 0);
         setSolReceived(data.total_sol_received || 0);
@@ -155,26 +170,39 @@ interface TimeLeft {
         toast.error("Failed to load presale progress.");
       }
     };
-
+  
+    const fetchCountdown = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/presale/countdown`);
+        const data: CountdownData = await response.json();
+        setCountdown(data);
+      } catch (error) {
+        console.error("Failed to fetch countdown data:", error);
+      }
+    };
+  
     fetchPresaleProgress();
- // Import FlipClock JavaScript dynamically
+    fetchCountdown();
+  
+    const countdownInterval = setInterval(fetchCountdown, 1000); // Refresh countdown every second
+  
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 60); // Example: 60-day countdown
-
+  
     const updateTimeLeft = () => {
       const now = new Date();
       const difference = endDate.getTime() - now.getTime();
-
+  
       if (difference <= 0) {
         setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
         return;
       }
-
+  
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
       const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const minutes = Math.floor((difference / (1000 / 60)) % 60);
       const seconds = Math.floor((difference / 1000) % 60);
-
+  
       setTimeLeft({
         days: days.toString().padStart(2, "0"),
         hours: hours.toString().padStart(2, "0"),
@@ -182,13 +210,21 @@ interface TimeLeft {
         seconds: seconds.toString().padStart(2, "0"),
       });
     };
-
-    // Update the timer every second
+  
     const timerId = setInterval(updateTimeLeft, 1000);
     updateTimeLeft();
-
-    return () => clearInterval(timerId); // Clean up the timer on component unmount
+  
+    // Cleanup function to clear intervals
+    return () => {
+      clearInterval(timerId);
+      clearInterval(countdownInterval);
+    };
   }, []);
+  
+
+  if (!countdown) return <p>Loading...</p>;
+
+  const { days, hours, minutes, seconds } = countdown.remaining_time;
   const handleSolChange = (sol: number) => {
     setSolAmount(sol);
     setRaidAmount(sol * RAID_PER_SOL);
@@ -363,17 +399,33 @@ return (
   </span>🚀
 </h1>
 
-<center><h2 className="text-xl font-semibold text-red-300 mb-4"> Ends In</h2></center>
+<center><h2 className="text-xl font-semibold text-red-300 mb-4"></h2></center>
 
-      <div className="flex justify-center space-x-4">
-        
-        {Object.entries(timeLeft).map(([unit, value]) => (
-          <div key={unit} className="flip-clock-unit">
-            <div className="flip-clock-label capitalize">{unit}</div>
-            <div className="flip-clock-digit">{value}</div>
+<div className="text-center">
+      <h2 className="text-xl font-semibold text-red-300 mb-4">Presale Ends In</h2>
+      {countdown.status === "expired" ? (
+        <p>{countdown.message}</p>
+      ) : (
+        <div className="flex justify-center space-x-4">
+          <div className="flip-clock-unit">
+            <div className="flip-clock-label">Days</div>
+            <div className="flip-clock-digit">{days}</div>
           </div>
-        ))}
-      </div>
+          <div className="flip-clock-unit">
+            <div className="flip-clock-label">Hours</div>
+            <div className="flip-clock-digit">{hours}</div>
+          </div>
+          <div className="flip-clock-unit">
+            <div className="flip-clock-label">Minutes</div>
+            <div className="flip-clock-digit">{minutes}</div>
+          </div>
+          <div className="flip-clock-unit">
+            <div className="flip-clock-label">Seconds</div>
+            <div className="flip-clock-digit">{seconds}</div>
+          </div>
+        </div>
+      )}
+    </div>
       {/* Description */}
       <p className="text-center text-gray-300 mb-8 text-lg">
         Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution!
