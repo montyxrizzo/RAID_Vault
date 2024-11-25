@@ -39,19 +39,27 @@ export default function DashboardFeature() {
                         subtitle={
                             <p className="text-xl md:text-2xl lg:text-3xl font-semibold text-indigo-200 mt-4 max-w-2xl mx-auto leading-snug">
                                 Powering AI with Distributed Efficiency—Rewarding You, Lowering Costs, Driving Innovation
+                                
                             </p>
+                            
+
                         }
+                        
                     />
+                  <center>  <Link
+  to="/get-raid"
+  className="text-white bg-red-600 text-1xl font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-red-600 focus:outline-none focus:ring-3 focus:ring-red-1300 transition duration-1200"
+  style={{
+    textDecoration: 'none',
+    display: 'inline-block',
+    textAlign: 'center',
+  }}
+>
+  INITIAL COIN OFFERING LIVE NOW!
+</Link></center>
+                    
                            <div className="mt-6 text-center">
-                    <Link
-                        to="/get-raid"
-                        className="text-red-500 text-3xl font-bold animate-pulse"
-                        style={{
-                            textDecoration: 'none',
-                        }}
-                    >
-                        INITIAL COIN OFFERING LIVE NOW!
-                    </Link>
+                
                 </div>
                     <br></br>
                       {/* Flashing Presale Link */}
