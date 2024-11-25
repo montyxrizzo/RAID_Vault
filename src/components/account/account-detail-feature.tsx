@@ -523,23 +523,23 @@ useEffect(() => {
   // <div className="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen p-6 flex flex-col items-center text-gray-200">
    
   <div
-  className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16"
+  className="relative bg-gradient-to-b from-gray-700 via-black to-gray-500 text-white min-h-screen py-16  flex flex-col items-center  "
   style={{
     backgroundImage: "url('/raid_alt.png')",
-    backgroundSize: "100% auto",
+    backgroundSize: "cover",
     backgroundPosition: "center",
   }}
 >
   <ToastContainer />
           {/* Circuit Board Background */}
       {/* <CircuitBoardBackground /> */}
-
+      <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6 bg-opacity-85">
     {/* Header Section */}
     <div className="max-w-3xl w-full text-center mb-8">
       <h1 className="text-4xl font-bold text-teal-400 mb-4">
         Earn <span className="text-white">RAID</span> by Staking!
       </h1>
-      <p className="text-gray-300 text-lg">
+      <p className="text-white-300 text-lg">
         Stake your SOL to help secure the network, earn rewards, and receive{" "}
         <span className="text-teal-400 font-semibold">RADEON</span> to earn{" "}
         <span className="text-teal-400 font-semibold">RAID</span> tokens —
@@ -547,9 +547,10 @@ useEffect(() => {
         investment in the futures of both AI & Crypto.
       </p>
     </div>
+    </div>
 
     {/* TVL Dashboard */}
-    <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6">
+    <div className="max-w-xl w-full bg-indigo-800 shadow-lg rounded-lg p-6 mb-6 bg-opacity-90">
       <h2 className="text-3xl font-bold text-teal-400 mb-4 text-center">
         Vault Metrics
       </h2>
@@ -565,7 +566,7 @@ useEffect(() => {
         Total Value Locked (TVL):
       </p>
       <div className="flex justify-center mt-4">
-        <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg">
+        <div className="bg-gray-900 text-teal-400 font-mono font-extrabold text-5xl p-6 rounded-lg shadow-lg bg-opacity-85">
           <animated.div>
             {animatedTvl.number.to((val: number) =>
               `$${formatNumberWithCommasAndDecimals(val)}`
@@ -579,7 +580,7 @@ useEffect(() => {
     {connected ? (
       <>
         {/* Account Details */}
-        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+        <div className="max-w-xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6 bg-opacity-95">
           <h2 className="text-2xl text-white font-bold text-teal-400 mb-4 text-center">
             Account Details
           </h2>
@@ -635,7 +636,7 @@ useEffect(() => {
         </div>
 
         {/* Vault Toggle */}
-        <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+        <div className="max-w-3xl w-full bg-gray-800 shadow-lg rounded-lg p-6 mb-6 bg-opacity-95">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="max-w-3xl w-full text-center mb-8">
               <h1 className="text-4xl font-bold text-teal-400 mb-4">The Vault 🔒</h1>
