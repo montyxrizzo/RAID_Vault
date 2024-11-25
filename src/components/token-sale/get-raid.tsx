@@ -377,32 +377,32 @@ return (
 </h1>
 
 <center><h2 className="text-xl font-semibold text-red-300 mb-4"></h2></center>
-
 <div className="text-center">
-      <h2 className="text-xl font-semibold text-red-300 mb-4">Ends in...</h2>
-      {countdown.status === "expired" ? (
-        <p>{countdown.message}</p>
-      ) : (
-        <div className="flex justify-center space-x-4">
-          <div className="flip-clock-unit">
-            <div className="flip-clock-label">Days</div>
-            <div className="flip-clock-digit">{days}</div>
-          </div>
-          <div className="flip-clock-unit">
-            <div className="flip-clock-label">Hours</div>
-            <div className="flip-clock-digit">{hours}</div>
-          </div>
-          <div className="flip-clock-unit">
-            <div className="flip-clock-label">Minutes</div>
-            <div className="flip-clock-digit">{minutes}</div>
-          </div>
-          <div className="flip-clock-unit">
-            <div className="flip-clock-label">Seconds</div>
-            <div className="flip-clock-digit">{seconds}</div>
-          </div>
-        </div>
-      )}
+  <h2 className="text-lg font-semibold text-red-300 mb-2 md:mb-4">Ends in...</h2>
+  {countdown.status === "expired" ? (
+    <p className="text-sm">{countdown.message}</p>
+  ) : (
+    <div className="flex justify-center flex-wrap space-x-2 md:space-x-4">
+      <div className="flip-clock-unit text-xs md:text-sm">
+        <div className="flip-clock-label">Days</div>
+        <div className="flip-clock-digit text-lg md:text-xl">{days}</div>
+      </div>
+      <div className="flip-clock-unit text-xs md:text-sm">
+        <div className="flip-clock-label">Hours</div>
+        <div className="flip-clock-digit text-lg md:text-xl">{hours}</div>
+      </div>
+      <div className="flip-clock-unit text-xs md:text-sm">
+        <div className="flip-clock-label">Minutes</div>
+        <div className="flip-clock-digit text-lg md:text-xl">{minutes}</div>
+      </div>
+      <div className="flip-clock-unit text-xs md:text-sm">
+        <div className="flip-clock-label">Seconds</div>
+        <div className="flip-clock-digit text-lg md:text-xl">{seconds}</div>
+      </div>
     </div>
+  )}
+</div>
+
       {/* Description */}
       <p className="text-center text-gray-300 mb-8 text-lg">
         Swap your SOL for RAID tokens to be the first to join the decentralized GPU revolution!
