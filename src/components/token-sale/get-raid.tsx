@@ -333,6 +333,7 @@ return (
       backgroundSize: "100% auto",
       backgroundPosition: "center",
     }}
+    
   >
         <ToastContainer />
     {/* Semi-transparent overlay for readability */}
